@@ -2,47 +2,95 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
+    
+    protected $table = 'usuarios';
+    
+    
+    protected $primaryKey = 'id_usuario';
+
+
     protected $fillable = [
-        'name',
-        'email',
-        'password',
+        'nombre',
+        'apellido',
+        'correo',
+        'contrasena',
+        'id_rol',
+        'activo'
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
+ 
     protected $hidden = [
-        'password',
-        'remember_token',
+        'contrasena',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    
+    public $timestamps = false;
+
+  
+    public function getAuthIdentifierName()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+        return 'correo';
+    }
+
+    public function getAuthPassword()
+    {
+        return $this->contrasena;
+    }
+
+   
+    public function getPasswordAttribute()
+    {
+        return $this->contrasena;
+    }
+
+    public function rol()
+    {
+        return $this->belongsTo(Rol::class, 'id_rol', 'id_rol');
+    }
+
+    
+    public function getNombreRolAttribute()
+    {
+      
+        $rolesMap = [
+            1 => 'admin',
+            2 => 'operadora',
+            3 => 'conductor',
+            4 => 'conductor',
+            5 => 'conductor',
+            6 => 'conductor',
+            7 => 'conductor',
+            8 => 'conductor',
+            9 => 'conductor',
+            10 => 'conductor',
+            11 => 'conductor',
+            12 => 'conductor',
         ];
+
+        return $rolesMap[$this->attributes['id_rol']] ?? 'conductor';
+    }
+
+    
+    public function esAdministrador()
+    {
+        return $this->id_rol === 1;
+    }
+
+
+    public function esOperadora()
+    {
+        return $this->id_rol === 2;
+    }
+
+    public function esConductor()
+    {
+        return $this->id_rol >= 3;
     }
 }
