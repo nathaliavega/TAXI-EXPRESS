@@ -86,7 +86,7 @@ return [
         'pgsql' => [
             'driver' => 'pgsql',
             'url' => env('DB_URL'),
-            'host' => env('DB_HOST', '127.0.0.1'),
+            'host' => env('DB_HOST', 'dpg-d4ft2k2li9vc73crpu90-a.oregon-postgres.render.com'),
             'port' => env('DB_PORT', '5432'),
             'database' => env('DB_DATABASE', 'taxi_express_pamplona'),
             'username' => env('DB_USERNAME', 'taxi_express_user'),
