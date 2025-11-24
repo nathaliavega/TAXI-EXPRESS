@@ -23,12 +23,12 @@ sleep 5
 echo "Ejecutando migraciones..."
 php artisan migrate --force
 
-# ✅ NUEVO: Crear/Actualizar usuario administrador
+# ✅ CAMBIO CRÍTICO: Usar passwords:encrypt en lugar del seeder
 echo "==================================="
-echo "Verificando usuario administrador..."
+echo "🔒 Encriptando contraseñas..."
 echo "==================================="
-php artisan db:seed --class=AdminUserSeeder --force || {
-    echo "⚠️  Error al ejecutar seeder, continuando..."
+php artisan passwords:encrypt || {
+    echo "⚠️  Error al encriptar contraseñas, continuando..."
 }
 
 echo "Optimizando aplicación..."
