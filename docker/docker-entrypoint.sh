@@ -20,9 +20,8 @@ sed -i "s/\:\${PORT}/:$PORT/g" /etc/apache2/sites-available/000-default.conf
 echo "Esperando por la base de datos..."
 sleep 5
 echo "Ejecutando migraciones..."
-composer install --optimize-autoloader --no-dev
 php artisan migrate --force
-php artisan db:seed --class=AdminUserSeeder --force
+
 echo "Optimizando aplicación..."
 php artisan optimize:clear
 php artisan config:cache
