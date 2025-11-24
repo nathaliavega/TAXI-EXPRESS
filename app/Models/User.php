@@ -27,30 +27,34 @@ class User extends Authenticatable
 
     public $timestamps = false;
 
-    // ✅ Este método define qué COLUMNA se usa para buscar al usuario
-    // Como quieres login por EMAIL, déjalo así:
+    // ✅ Define qué columna se usa para el USERNAME (email/correo)
     public function getAuthIdentifierName()
     {
-        return 'correo'; // ← Busca por email al autenticar
+        return 'correo';
     }
 
-    // ✅ Este método define qué VALOR se guarda en la sesión
-    // Aquí sí quieres el ID numérico para evitar el error de PostgreSQL
+    // ✅ Define qué ID se guarda en la sesión
     public function getAuthIdentifier()
     {
-        return $this->id_usuario; // ← Guarda el ID en la sesión
+        return $this->id_usuario;
     }
 
+    // ✅ CRÍTICO: Define qué columna contiene la contraseña
     public function getAuthPassword()
     {
         return $this->contrasena;
     }
 
-    // ❌ ELIMINA ESTO - está interfiriendo con Laravel
-    // public function getPasswordAttribute()
-    // {
-    //     return $this->contrasena;
-    // }
+    // ✅ NUEVO: Mapea 'password' a 'contrasena' para que Laravel lo encuentre
+    public function getPasswordAttribute()
+    {
+        return $this->attributes['contrasena'] ?? null;
+    }
+
+    public function setPasswordAttribute($value)
+    {
+        $this->attributes['contrasena'] = $value;
+    }
 
     public function rol()
     {
