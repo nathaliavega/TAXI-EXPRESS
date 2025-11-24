@@ -23,13 +23,15 @@ sleep 5
 echo "Ejecutando migraciones..."
 php artisan migrate --force
 
-# ✅ CAMBIO CRÍTICO: Usar passwords:encrypt en lugar del seeder
+# ✅ FORZAR encriptación en cada deploy
 echo "==================================="
-echo "🔒 Encriptando contraseñas..."
+echo "🔒 FORZANDO encriptación de contraseñas..."
 echo "==================================="
-php artisan passwords:encrypt || {
-    echo "⚠️  Error al encriptar contraseñas, continuando..."
-}
+php artisan passwords:encrypt --force || echo "⚠️  Comando passwords:encrypt no disponible"
+
+# ✅ ALTERNATIVA: Ejecutar seeder si el comando falla
+echo "🔄 Ejecutando seeder de contraseñas..."
+php artisan db:seed --class=PasswordEncryptionSeeder --force || echo "⚠️  Seeder no disponible"
 
 echo "Optimizando aplicación..."
 php artisan optimize:clear
