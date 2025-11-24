@@ -5,24 +5,31 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\OperadoraController;
 use App\Http\Controllers\ConductorController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Artisan;
 
-// 🔥 RUTA ESPECIAL PARA ENCRIPTAR CONTRASEÑAS (EJECUTAR UNA SOLA VEZ)
-Route::get('/encrypt-passwords-now', function() {
-    try {
-        Artisan::call('db:seed', [
-            '--class' => 'ForcePasswordEncryption',
-            '--force' => true
-        ]);
-        
-        $output = Artisan::output();
-        return redirect('/login')->with('success', '✅ Contraseñas encriptadas correctamente. Puedes hacer login ahora.');
-    } catch (\Exception $e) {
+// 🔍 RUTA DE DIAGNÓSTICO TEMPORAL
+Route::get('/test-auth', function() {
+    $user = \App\Models\User::where('correo', 'elder.garcia@gmail.com')->first();
+    
+    if (!$user) {
         return response()->json([
-            'error' => $e->getMessage(),
-            'message' => 'Error al encriptar contraseñas'
-        ], 500);
+            'error' => 'Usuario NO encontrado en la base de datos',
+            'correo_buscado' => 'elder.garcia@gmail.com'
+        ]);
     }
+    
+    $passwordCheck = \Illuminate\Support\Facades\Hash::check('elder123', $user->contrasena);
+    
+    return response()->json([
+        'usuario_existe' => true,
+        'correo' => $user->correo,
+        'nombre' => $user->nombre,
+        'tiene_contrasena' => !empty($user->contrasena),
+        'contrasena_hash' => substr($user->contrasena, 0, 30) . '...',
+        'contrasena_encriptada' => str_starts_with($user->contrasena, '$2y$'),
+        'usuario_activo' => (bool)$user->activo,
+        'id_rol' => $user->id_rol,
+        'password_correcto' => $passwordCheck,
+    ]);
 });
 
 // RUTAS PÚBLICAS
