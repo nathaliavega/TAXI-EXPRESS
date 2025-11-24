@@ -9,12 +9,8 @@ class User extends Authenticatable
 {
     use Notifiable;
 
-    
     protected $table = 'usuarios';
-    
-    
     protected $primaryKey = 'id_usuario';
-
 
     protected $fillable = [
         'nombre',
@@ -25,18 +21,22 @@ class User extends Authenticatable
         'activo'
     ];
 
- 
     protected $hidden = [
         'contrasena',
     ];
 
-    
     public $timestamps = false;
 
-  
+    // ✅ CAMBIA ESTO:
     public function getAuthIdentifierName()
     {
-        return 'correo';
+        return 'id_usuario'; // ← Debe ser la primary key, NO 'correo'
+    }
+
+    // ✅ AGREGA ESTO para que Laravel sepa qué valor guardar:
+    public function getAuthIdentifier()
+    {
+        return $this->id_usuario; // ← Retorna el ID numérico
     }
 
     public function getAuthPassword()
@@ -44,7 +44,6 @@ class User extends Authenticatable
         return $this->contrasena;
     }
 
-   
     public function getPasswordAttribute()
     {
         return $this->contrasena;
@@ -55,10 +54,8 @@ class User extends Authenticatable
         return $this->belongsTo(Rol::class, 'id_rol', 'id_rol');
     }
 
-    
     public function getNombreRolAttribute()
     {
-      
         $rolesMap = [
             1 => 'admin',
             2 => 'operadora',
@@ -77,12 +74,10 @@ class User extends Authenticatable
         return $rolesMap[$this->attributes['id_rol']] ?? 'conductor';
     }
 
-    
     public function esAdministrador()
     {
         return $this->id_rol === 1;
     }
-
 
     public function esOperadora()
     {
