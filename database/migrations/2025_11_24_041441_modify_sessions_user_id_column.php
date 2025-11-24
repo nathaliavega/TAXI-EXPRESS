@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Primero eliminar el índice si existe
+        
         Schema::table('sessions', function (Blueprint $table) {
             $table->dropIndex(['user_id']);
         });
