@@ -16,11 +16,20 @@ echo "Esperando por la base de datos..."
 sleep 5
 
 echo "==================================="
-echo "🔄 Ejecutando migraciones (incluye encriptación)..."
+echo "🔄 Ejecutando migraciones..."
 echo "==================================="
 php artisan migrate --force
 
+echo "==================================="
+echo "🔒 Encriptando contraseñas..."
+echo "==================================="
+php artisan passwords:encrypt || {
+    echo "⚠️  Error al encriptar contraseñas, continuando..."
+}
+
+echo "==================================="
 echo "Optimizando aplicación..."
+echo "==================================="
 php artisan optimize:clear
 php artisan config:cache
 php artisan route:cache
