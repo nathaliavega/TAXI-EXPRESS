@@ -27,7 +27,7 @@ class User extends Authenticatable
 
     public $timestamps = false;
 
-    // ✅ Define qué columna se usa para el USERNAME (email/correo)
+    // ✅ Define qué columna se usa para el USERNAME
     public function getAuthIdentifierName()
     {
         return 'correo';
@@ -45,15 +45,10 @@ class User extends Authenticatable
         return $this->contrasena;
     }
 
-    // ✅ NUEVO: Mapea 'password' a 'contrasena' para que Laravel lo encuentre
-    public function getPasswordAttribute()
+    // ✅ CRÍTICO: Indica a Laravel qué columna usar para la contraseña
+    public function getAuthPasswordName()
     {
-        return $this->attributes['contrasena'] ?? null;
-    }
-
-    public function setPasswordAttribute($value)
-    {
-        $this->attributes['contrasena'] = $value;
+        return 'contrasena';
     }
 
     public function rol()

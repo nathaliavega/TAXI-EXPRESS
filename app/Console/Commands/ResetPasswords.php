@@ -50,7 +50,7 @@ class ResetPasswords extends Command
         
         $this->info('👨‍💼 ADMINISTRADOR:');
         $this->table(
-            ['Correo', 'Contraseña'],
+            ['Correo', 'Contrasena'],
             [
                 ['elder.garcia@gmail.com', 'elder123'],
             ]
@@ -59,7 +59,7 @@ class ResetPasswords extends Command
         $this->newLine();
         $this->info('👩‍💼 OPERADORA:');
         $this->table(
-            ['Correo', 'Contraseña'],
+            ['Correo', 'Contrasena'],
             [
                 ['diana.lopez@gmail.com', 'diana123'],
             ]
@@ -68,7 +68,7 @@ class ResetPasswords extends Command
         $this->newLine();
         $this->info('🚗 CONDUCTORES:');
         $this->table(
-            ['Correo', 'Contraseña'],
+            ['Correo', 'Contrasena'],
             [
                 ['juan.martinez@gmail.com', 'andres123'],
                 ['carlos.rodriguez@gmail.com', 'carlos123'],
