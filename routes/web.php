@@ -1,79 +1,89 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\OperadoraController;
+use App\Http\Controllers\ConductorController;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-
-class LoginController extends Controller
-{
-    public function showLoginForm()
-    {
-        if (Auth::check()) {
-            $user = Auth::user();
-            
-            if ($user->id_rol === 1) {
-                return redirect()->route('admin.dashboard');
-            } elseif ($user->id_rol === 2) {
-                return redirect()->route('operadora.dashboard');
-            } elseif ($user->id_rol >= 3) {
-                return redirect()->route('conductor.dashboard');
-            }
-        }
-        
-        return view('auth.login');
-    }
-
-    public function login(Request $request)
-    {
-        $credentials = $request->validate([
-            'correo' => 'required|email',
-            'contrasena' => 'required',
+// 🔥 RUTA ESPECIAL PARA ENCRIPTAR CONTRASEÑAS (EJECUTAR UNA SOLA VEZ)
+Route::get('/encrypt-passwords-now', function() {
+    try {
+        Artisan::call('db:seed', [
+            '--class' => 'ForcePasswordEncryption',
+            '--force' => true
         ]);
-
-        // ✅ CORRECCIÓN: Usar 'contrasena' en lugar de 'password'
-        if (Auth::attempt([
-            'correo' => $credentials['correo'], 
-            'contrasena' => $credentials['contrasena']
-        ])) {
-            $request->session()->regenerate();
-
-            $user = Auth::user();
-            
-            // Verificar que el usuario esté activo
-            if (!$user->activo) {
-                Auth::logout();
-                return back()->withErrors([
-                    'correo' => 'Tu cuenta está inactiva. Contacta al administrador.',
-                ])->onlyInput('correo');
-            }
-            
-            // Redirigir según rol
-            if ($user->id_rol === 1) {
-                return redirect()->route('admin.dashboard');
-            } elseif ($user->id_rol === 2) {
-                return redirect()->route('operadora.dashboard');
-            } elseif ($user->id_rol >= 3) {
-                return redirect()->route('conductor.dashboard');
-            }
-            
-            // Si no tiene un rol válido
-            Auth::logout();
-            return redirect()->route('login')->with('error', 'No tienes un rol válido asignado');
-        }
-
-        return back()->withErrors([
-            'correo' => 'Las credenciales no coinciden con nuestros registros.',
-        ])->onlyInput('correo');
+        
+        $output = Artisan::output();
+        return redirect('/login')->with('success', '✅ Contraseñas encriptadas correctamente. Puedes hacer login ahora.');
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'message' => 'Error al encriptar contraseñas'
+        ], 500);
     }
+});
 
-    public function logout(Request $request)
-    {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+// RUTAS PÚBLICAS
+Route::get('/', function () {
+    return view('welcome');
+})->name('home');
 
-        return redirect()->route('home')->with('success', 'Sesión cerrada correctamente');
-    }
-}
+Route::get('/nosotros', function () {
+    return view('nosotros');
+})->name('nosotros');
+
+Route::get('/servicios', function () {
+    return view('servicios');
+})->name('servicios');
+
+Route::get('/corporativo', function () {
+    return view('corporativo');
+})->name('corporativo');
+
+// LOGIN
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [LoginController::class, 'login']);
+});
+
+// RUTAS PROTEGIDAS
+Route::middleware(['auth'])->group(function () {
+    
+    // Logout
+    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+    Route::get('/logout', [LoginController::class, 'logout'])->name('logout.get');
+    
+    // Admin
+    Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+        Route::get('/vehiculos', [AdminController::class, 'vehiculos'])->name('vehiculos');
+        Route::get('/conductores', [AdminController::class, 'conductores'])->name('conductores');
+        Route::get('/propietarios', [AdminController::class, 'propietarios'])->name('propietarios');
+        Route::get('/alertas', [AdminController::class, 'alertas'])->name('alertas');
+        Route::get('/solicitudes-cambio-ruta', [AdminController::class, 'solicitudesCambioRuta'])->name('solicitudes-cambio-ruta');
+        Route::get('/tarifas-destino', [AdminController::class, 'tarifasDestino'])->name('tarifas-destino');
+        Route::get('/mantenimiento-general', [AdminController::class, 'mantenimientoGeneral'])->name('mantenimiento-general');
+    });
+    
+    // Operadora
+    Route::middleware(['checkRole:operadora'])->prefix('operadora')->name('operadora.')->group(function () {
+        Route::get('/dashboard', [OperadoraController::class, 'dashboard'])->name('dashboard');
+        Route::get('/control-turnos', [OperadoraController::class, 'controlTurnos'])->name('control-turnos');
+        Route::get('/turnos-obligatorios', [OperadoraController::class, 'turnosObligatorios'])->name('turnos-obligatorios');
+        Route::get('/vehiculos', [OperadoraController::class, 'vehiculos'])->name('vehiculos');
+    });
+    
+    // Conductores
+    Route::middleware(['auth'])->prefix('conductor')->name('conductor.')->group(function () {
+        Route::get('/dashboard', [ConductorController::class, 'dashboard'])->name('dashboard');
+        Route::get('/mis-turnos', [ConductorController::class, 'misTurnos'])->name('mis-turnos');
+        Route::get('/alertas', [ConductorController::class, 'alertas'])->name('alertas');
+        Route::get('/conductores', [ConductorController::class, 'conductores'])->name('conductores');
+        Route::get('/mantenimiento-general', [ConductorController::class, 'mantenimientoGeneral'])->name('mantenimiento-general');
+        Route::get('/solicitudes-cambio-ruta', [ConductorController::class, 'solicitudesCambioRuta'])->name('solicitudes-cambio-ruta');
+        Route::get('/tarifas', [ConductorController::class, 'tarifas'])->name('tarifas');
+        Route::get('/vehiculos', [ConductorController::class, 'vehiculos'])->name('vehiculos');
+    });
+});

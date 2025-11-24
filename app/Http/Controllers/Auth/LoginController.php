@@ -10,7 +10,6 @@ class LoginController extends Controller
 {
     public function showLoginForm()
     {
-        
         if (Auth::check()) {
             $user = Auth::user();
             
@@ -33,13 +32,24 @@ class LoginController extends Controller
             'contrasena' => 'required',
         ]);
 
-       
-        if (Auth::attempt(['correo' => $credentials['correo'], 'password' => $credentials['contrasena']])) {
+        // ✅ CAMBIO CRÍTICO: Usar 'contrasena' en lugar de 'password'
+        if (Auth::attempt([
+            'correo' => $credentials['correo'], 
+            'contrasena' => $credentials['contrasena']
+        ])) {
             $request->session()->regenerate();
 
-           
             $user = Auth::user();
             
+            // Verificar que el usuario esté activo
+            if (!$user->activo) {
+                Auth::logout();
+                return back()->withErrors([
+                    'correo' => 'Tu cuenta está inactiva. Contacta al administrador.',
+                ])->onlyInput('correo');
+            }
+            
+            // Redirigir según rol
             if ($user->id_rol === 1) {
                 return redirect()->route('admin.dashboard');
             } elseif ($user->id_rol === 2) {
@@ -48,7 +58,7 @@ class LoginController extends Controller
                 return redirect()->route('conductor.dashboard');
             }
             
-            
+            // Si no tiene un rol válido
             Auth::logout();
             return redirect()->route('login')->with('error', 'No tienes un rol válido asignado');
         }
@@ -64,7 +74,6 @@ class LoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        
         return redirect()->route('home')->with('success', 'Sesión cerrada correctamente');
     }
 }
