@@ -19,8 +19,17 @@ sed -i "s/\:\${PORT}/:$PORT/g" /etc/apache2/sites-available/000-default.conf
 
 echo "Esperando por la base de datos..."
 sleep 5
+
 echo "Ejecutando migraciones..."
 php artisan migrate --force
+
+# ✅ NUEVO: Crear/Actualizar usuario administrador
+echo "==================================="
+echo "Verificando usuario administrador..."
+echo "==================================="
+php artisan db:seed --class=AdminUserSeeder --force || {
+    echo "⚠️  Error al ejecutar seeder, continuando..."
+}
 
 echo "Optimizando aplicación..."
 php artisan optimize:clear
@@ -31,6 +40,10 @@ php artisan view:cache
 echo "Verificando permisos..."
 chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
+echo "==================================="
+echo "✅ Aplicación lista!"
+echo "👤 Usuario admin: elder.garcia@gmail.com"
+echo "🔑 Contraseña: elder123"
 echo "==================================="
 echo "Iniciando Apache en puerto $PORT..."
 echo "==================================="
