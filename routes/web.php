@@ -5,6 +5,25 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\OperadoraController;
 use App\Http\Controllers\ConductorController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
+
+// 🔥 RUTA ESPECIAL PARA ENCRIPTAR CONTRASEÑAS (EJECUTAR UNA SOLA VEZ)
+Route::get('/encrypt-passwords-now', function() {
+    try {
+        Artisan::call('db:seed', [
+            '--class' => 'ForcePasswordEncryption',
+            '--force' => true
+        ]);
+        
+        $output = Artisan::output();
+        return redirect('/login')->with('success', '✅ Contraseñas encriptadas correctamente. Puedes hacer login ahora.');
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'message' => 'Error al encriptar contraseñas'
+        ], 500);
+    }
+});
 
 // RUTAS PÚBLICAS
 Route::get('/', function () {
@@ -38,16 +57,15 @@ Route::middleware(['auth'])->group(function () {
     
     // Admin
     Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
-    Route::get('/vehiculos', [AdminController::class, 'vehiculos'])->name('vehiculos');
-    Route::get('/conductores', [AdminController::class, 'conductores'])->name('conductores');
-    Route::get('/propietarios', [AdminController::class, 'propietarios'])->name('propietarios');
-    Route::get('/alertas', [AdminController::class, 'alertas'])->name('alertas');
-    Route::get('/solicitudes-cambio-ruta', [AdminController::class, 'solicitudesCambioRuta'])->name('solicitudes-cambio-ruta');
-    Route::get('/tarifas-destino', [AdminController::class, 'tarifasDestino'])->name('tarifas-destino');
-    Route::get('/mantenimiento-general', [AdminController::class, 'mantenimientoGeneral'])->name('mantenimiento-general');
-
-});
+        Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+        Route::get('/vehiculos', [AdminController::class, 'vehiculos'])->name('vehiculos');
+        Route::get('/conductores', [AdminController::class, 'conductores'])->name('conductores');
+        Route::get('/propietarios', [AdminController::class, 'propietarios'])->name('propietarios');
+        Route::get('/alertas', [AdminController::class, 'alertas'])->name('alertas');
+        Route::get('/solicitudes-cambio-ruta', [AdminController::class, 'solicitudesCambioRuta'])->name('solicitudes-cambio-ruta');
+        Route::get('/tarifas-destino', [AdminController::class, 'tarifasDestino'])->name('tarifas-destino');
+        Route::get('/mantenimiento-general', [AdminController::class, 'mantenimientoGeneral'])->name('mantenimiento-general');
+    });
     
     // Operadora
     Route::middleware(['checkRole:operadora'])->prefix('operadora')->name('operadora.')->group(function () {
@@ -55,18 +73,17 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/control-turnos', [OperadoraController::class, 'controlTurnos'])->name('control-turnos');
         Route::get('/turnos-obligatorios', [OperadoraController::class, 'turnosObligatorios'])->name('turnos-obligatorios');
         Route::get('/vehiculos', [OperadoraController::class, 'vehiculos'])->name('vehiculos');
-
-});
+    });
     
     // Conductores
-   Route::middleware(['auth'])->prefix('conductor')->name('conductor.')->group(function () {
-    Route::get('/dashboard', [ConductorController::class, 'dashboard'])->name('dashboard');
-    Route::get('/mis-turnos', [ConductorController::class, 'misTurnos'])->name('mis-turnos');
-    Route::get('/alertas', [ConductorController::class, 'alertas'])->name('alertas');
-    Route::get('/conductores', [ConductorController::class, 'conductores'])->name('conductores');
-    Route::get('/mantenimiento-general', [ConductorController::class, 'mantenimientoGeneral'])->name('mantenimiento-general');
-    Route::get('/solicitudes-cambio-ruta', [ConductorController::class, 'solicitudesCambioRuta'])->name('solicitudes-cambio-ruta');
-    Route::get('/tarifas', [ConductorController::class, 'tarifas'])->name('tarifas');
-    Route::get('/vehiculos', [ConductorController::class, 'vehiculos'])->name('vehiculos');
-});
+    Route::middleware(['auth'])->prefix('conductor')->name('conductor.')->group(function () {
+        Route::get('/dashboard', [ConductorController::class, 'dashboard'])->name('dashboard');
+        Route::get('/mis-turnos', [ConductorController::class, 'misTurnos'])->name('mis-turnos');
+        Route::get('/alertas', [ConductorController::class, 'alertas'])->name('alertas');
+        Route::get('/conductores', [ConductorController::class, 'conductores'])->name('conductores');
+        Route::get('/mantenimiento-general', [ConductorController::class, 'mantenimientoGeneral'])->name('mantenimiento-general');
+        Route::get('/solicitudes-cambio-ruta', [ConductorController::class, 'solicitudesCambioRuta'])->name('solicitudes-cambio-ruta');
+        Route::get('/tarifas', [ConductorController::class, 'tarifas'])->name('tarifas');
+        Route::get('/vehiculos', [ConductorController::class, 'vehiculos'])->name('vehiculos');
+    });
 });
