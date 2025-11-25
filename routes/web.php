@@ -6,33 +6,7 @@ use App\Http\Controllers\OperadoraController;
 use App\Http\Controllers\ConductorController;
 use Illuminate\Support\Facades\Route;
 
-// 🔍 RUTA DE DIAGNÓSTICO TEMPORAL
-Route::get('/test-auth', function() {
-    $user = \App\Models\User::where('correo', 'elder.garcia@gmail.com')->first();
-    
-    if (!$user) {
-        return response()->json([
-            'error' => 'Usuario NO encontrado en tabla usuarios',
-            'correo_buscado' => 'elder.garcia@gmail.com',
-            'tabla' => 'usuarios'
-        ]);
-    }
-    
-    $passwordCheck = \Illuminate\Support\Facades\Hash::check('elder123', $user->contrasena);
-    
-    return response()->json([
-        'usuario_existe' => true,
-        'correo' => $user->correo,
-        'nombre' => $user->nombre,
-        'tiene_contrasena' => !empty($user->contrasena),
-        'contrasena_hash' => substr($user->contrasena, 0, 30) . '...',
-        'contrasena_encriptada' => str_starts_with($user->contrasena, '$2y$'),
-        'usuario_activo' => (bool)$user->activo,
-        'id_rol' => $user->id_rol,
-        'password_correcto' => $passwordCheck,
-        'tabla_usada' => 'usuarios'
-    ]);
-});
+
 
 // RUTAS PÚBLICAS
 Route::get('/', function () {

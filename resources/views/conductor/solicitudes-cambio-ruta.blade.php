@@ -330,7 +330,11 @@
                             </label>
                             <select name="id_conductor" required class="form-select">
                                 <option value="">Seleccionar conductor...</option>
-                                <!-- Los datos de conductores vendrán del backend Laravel -->
+                                @foreach($conductores as $conductor)
+                                    <option value="{{ $conductor->id_conductor }}">
+                                        {{ $conductor->primer_nombre }} {{ $conductor->primer_apellido }} - {{ $conductor->tipo_documento }} {{ $conductor->numero_documento }}
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
 
@@ -340,7 +344,11 @@
                             </label>
                             <select name="id_vehiculo" required class="form-select">
                                 <option value="">Seleccionar vehículo...</option>
-                                <!-- Los datos de vehículos vendrán del backend Laravel -->
+                                @foreach($vehiculos as $vehiculo)
+                                    <option value="{{ $vehiculo->id_vehiculo }}">
+                                        {{ $vehiculo->placa }} - {{ $vehiculo->marca ?? '' }} {{ $vehiculo->modelo ?? '' }}
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
                     </div>
@@ -381,12 +389,6 @@
                         Origen y Destino
                     </h3>
                     
-                    <!-- CAMPO AGREGADO: Origen Actual -->
-                    <div class="form-group">
-                        <label class="form-label">Origen Actual <span class="required">*</span></label>
-                        <textarea name="origen_actual" required placeholder="Ubicación actual del conductor o punto de partida" class="form-textarea" rows="2"></textarea>
-                    </div>
-
                     <div class="form-group">
                         <label class="form-label">Dirección de Origen <span class="required">*</span></label>
                         <textarea name="direccion_origen" required placeholder="Dirección completa de recogida del pasajero" class="form-textarea" rows="2"></textarea>

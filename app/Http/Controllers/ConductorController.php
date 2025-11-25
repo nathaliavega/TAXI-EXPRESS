@@ -3,146 +3,48 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\TurnoObligatorio;
-use App\Models\Alerta;
 use App\Models\Conductor;
-use App\Models\MantenimientoGeneral;
-use App\Models\SolicitudCambioRuta;
-use App\Models\Propietario;
-use App\Models\TarifaDestino;
 use App\Models\Vehiculo;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ConductorController extends Controller
 {
-    
-    private function getConductorAutenticado()
+    /**
+     * Mostrar el formulario de solicitudes de cambio de ruta
+     * Ruta: GET /conductor/solicitudes-cambio-ruta
+     */
+    public function nuevaSolicitudCambioRuta()  // ← CAMBIO AQUÍ
     {
-        $user = Auth::user();
+        // Obtener todos los conductores
+        $conductores = Conductor::select(
+            'id_conductor',
+            'primer_nombre',
+            'segundo_nombre',
+            'primer_apellido',
+            'segundo_apellido',
+            'tipo_documento',
+            'numero_documento'
+        )->get();
         
-        if (!$user) {
-            return null;
-        }
-        
-        return Conductor::where('email', $user->correo)->first();
-    }
-
-   
-    public function dashboard()
-    {
-        $conductor = $this->getConductorAutenticado();
-
-        if (!$conductor) {
-            return view('conductor.dashboard', [
-                'conductor' => null,
-                'turnosProximos' => collect([]),
-                'solicitudesPendientes' => 0,
-                'alertas' => collect([]),
-                'error' => 'No se encontró un perfil de conductor asociado a tu cuenta.'
-            ]);
-        }
-
-        $turnosProximos = TurnoObligatorio::with('vehiculo')
-            ->where('id_conductor', $conductor->id_conductor)
-            ->whereDate('fecha_turno', '>=', Carbon::today())
-            ->orderBy('fecha_turno', 'asc')
-            ->limit(5)
-            ->get();
-
-       
-        $solicitudesPendientes = SolicitudCambioRuta::where('id_conductor', $conductor->id_conductor)
-            ->whereNull('autorizado_por')
-            ->count();
-
-        
-        $alertas = Alerta::where('id_conductor', $conductor->id_conductor)
-            ->where('resuelta', false)
-            ->orderByRaw("CASE 
-                WHEN prioridad = 'critica' THEN 1 
-                WHEN prioridad = 'alta' THEN 2 
-                WHEN prioridad = 'media' THEN 3 
-                ELSE 4 END")
-            ->orderBy('fecha_alerta', 'desc')
-            ->limit(5)
-            ->get();
-
-        return view('conductor.dashboard', compact(
-            'conductor',
-            'turnosProximos',
-            'solicitudesPendientes',
-            'alertas'
-        ));
-    }
-
-   
-    public function misTurnos()
-    {
-        $conductor = $this->getConductorAutenticado();
-
-        if (!$conductor) {
-            return redirect()->route('conductor.dashboard')
-                ->with('error', 'No se encontró información del conductor');
-        }
-
-        $turnos = TurnoObligatorio::with(['vehiculo', 'conductor', 'asignadoPor'])
-            ->where('id_conductor', $conductor->id_conductor)
-            ->whereDate('fecha_turno', '>=', Carbon::today())
-            ->orderBy('fecha_turno', 'asc')
-            ->paginate(20);
-
-        return view('conductor.mis-turnos', compact('turnos'));
-    }
-
-    
-    public function alertas()
-    {
-        $conductor = $this->getConductorAutenticado();
-
-        if (!$conductor) {
-            return redirect()->route('conductor.dashboard')
-                ->with('error', 'No se encontró información del conductor');
-        }
-
-        $alertas = Alerta::with(['vehiculo', 'conductor'])
-            ->where('id_conductor', $conductor->id_conductor)
-            ->orderBy('resuelta', 'asc')
-            ->orderByRaw("CASE 
-                WHEN prioridad = 'critica' THEN 1 
-                WHEN prioridad = 'alta' THEN 2 
-                WHEN prioridad = 'media' THEN 3 
-                ELSE 4 END")
-            ->orderBy('fecha_alerta', 'desc')
-            ->paginate(20);
-
-        return view('conductor.alertas', compact('alertas'));
-    }
-
-    public function mantenimientoGeneral()
-    {
-        $mantenimientos = MantenimientoGeneral::orderBy('nombre', 'asc')
-            ->paginate(20);
-
-        return view('conductor.mantenimiento-general', compact('mantenimientos'));
-    }
-
-    // ✅ MÉTODO PARA MOSTRAR EL FORMULARIO DE NUEVA SOLICITUD
-    public function nuevaSolicitudCambioRuta()
-    {
-        $conductores = Conductor::where('estado', 'activo')
-            ->orderBy('primer_nombre')
-            ->orderBy('primer_apellido')
-            ->get();
-        
-        $vehiculos = Vehiculo::orderBy('placa')->get();
+        // Obtener todos los vehículos
+        $vehiculos = Vehiculo::select(
+            'id_vehiculo',
+            'placa',
+            'marca',
+            'modelo'
+        )->get();
         
         return view('conductor.solicitudes-cambio-ruta', compact('conductores', 'vehiculos'));
     }
-
-    // ✅ AQUÍ VA EL MÉTODO storeSolicitudCambioRuta - DESPUÉS DE nuevaSolicitudCambioRuta
-    public function storeSolicitudCambioRuta(Request $request)
+    
+    /**
+     * Guardar la solicitud de cambio de ruta
+     * Ruta: POST /conductor/solicitudes-cambio-ruta
+     */
+    public function storeSolicitudCambioRuta(Request $request)  // ← CAMBIO AQUÍ
     {
-        $validated = $request->validate([
+        // Validar los datos del formulario
+        $validatedData = $request->validate([
             'id_conductor' => 'required|exists:conductores,id_conductor',
             'id_vehiculo' => 'required|exists:vehiculos,id_vehiculo',
             'nombre_contratante' => 'required|string|max:200',
@@ -152,52 +54,45 @@ class ConductorController extends Controller
             'direccion_destino' => 'required|string',
             'fecha_viaje_programada' => 'nullable|date',
             'numero_pasajeros' => 'nullable|integer|min:1',
-            'tarifa_cobrada' => 'nullable|numeric|min:0',
+            'tarifa_cobrada' => 'required|numeric|min:0',
+        ], [
+            // Mensajes personalizados en español
+            'id_conductor.required' => 'Debe seleccionar un conductor',
+            'id_vehiculo.required' => 'Debe seleccionar un vehículo',
+            'nombre_contratante.required' => 'El nombre del contratante es obligatorio',
+            'documento_contratante.required' => 'El documento del contratante es obligatorio',
+            'telefono_contratante.required' => 'El teléfono del contratante es obligatorio',
+            'direccion_origen.required' => 'La dirección de origen es obligatoria',
+            'direccion_destino.required' => 'La dirección de destino es obligatoria',
+            'tarifa_cobrada.required' => 'La tarifa es obligatoria',
+            'tarifa_cobrada.numeric' => 'La tarifa debe ser un número válido',
+            'numero_pasajeros.min' => 'Debe haber al menos 1 pasajero',
         ]);
 
         try {
-            // Buscar una tarifa por defecto (la primera activa)
-            $tarifaDefault = TarifaDestino::first();
-            
-            if (!$tarifaDefault) {
-                return redirect()->back()
-                    ->withInput()
-                    ->with('error', 'No hay tarifas configuradas en el sistema');
-            }
-
-            // Guardar la solicitud
-            $solicitud = SolicitudCambioRuta::create([
-                'id_conductor' => $validated['id_conductor'],
-                'id_vehiculo' => $validated['id_vehiculo'],
-                'id_tarifa_destino' => $tarifaDefault->id_tarifa,
-                'nombre_contratante' => $validated['nombre_contratante'],
-                'documento_contratante' => $validated['documento_contratante'],
-                'telefono_contratante' => $validated['telefono_contratante'],
-                'direccion_origen' => $validated['direccion_origen'],
-                'direccion_destino' => $validated['direccion_destino'],
-                'fecha_viaje_programada' => $validated['fecha_viaje_programada'] ?? now()->addHour(),
-                'numero_pasajeros' => $validated['numero_pasajeros'] ?? 1,
-                'tarifa_cobrada' => $validated['tarifa_cobrada'] ?? $tarifaDefault->tarifa,
+            // Insertar la solicitud en la base de datos
+            DB::table('solicitudes_cambio_ruta')->insert([
+                'id_conductor' => $validatedData['id_conductor'],
+                'id_vehiculo' => $validatedData['id_vehiculo'],
+                'id_tarifa_destino' => 1, // TODO: Calcular según la tarifa real
+                'nombre_contratante' => $validatedData['nombre_contratante'],
+                'documento_contratante' => $validatedData['documento_contratante'],
+                'telefono_contratante' => $validatedData['telefono_contratante'],
+                'direccion_origen' => $validatedData['direccion_origen'],
+                'direccion_destino' => $validatedData['direccion_destino'],
+                'fecha_viaje_programada' => $validatedData['fecha_viaje_programada'] ?? now(),
+                'numero_pasajeros' => $validatedData['numero_pasajeros'] ?? 1,
+                'tarifa_cobrada' => $validatedData['tarifa_cobrada'],
                 'fecha_solicitud' => now(),
             ]);
-
-            return redirect()->route('conductor.dashboard')
-                ->with('success', '✅ Solicitud enviada correctamente');
+            
+            return redirect()->route('conductor.solicitudes-cambio-ruta')
+                ->with('success', '✅ Solicitud de servicio registrada exitosamente');
             
         } catch (\Exception $e) {
             return redirect()->back()
-                ->withInput()
-                ->with('error', 'Error al guardar la solicitud: ' . $e->getMessage());
+                ->withErrors(['error' => 'Error al registrar la solicitud: ' . $e->getMessage()])
+                ->withInput();
         }
-    }
-
-
-  
-    public function tarifas()
-    {
-        $tarifas = TarifaDestino::orderBy('nombre_destino', 'asc')
-            ->paginate(20);
-
-        return view('conductor.tarifas', compact('tarifas'));
     }
 }
