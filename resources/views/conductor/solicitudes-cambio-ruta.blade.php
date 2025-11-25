@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solicitudes de Servicio - TAXI EXPRESS</title>
+    <title>Solicitudes Cambio Ruta</title>
     <style>
         * {
             margin: 0;
@@ -298,7 +298,7 @@
         </div>
     </div>
 
-    <a href="{{ route('conductor.dashboard') }}" class="btn-volver">
+    <a href="#" class="btn-volver">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
         </svg>
@@ -312,9 +312,7 @@
                 <p>Completa el formulario para solicitar un servicio de taxi</p>
             </div>
 
-            <form action="{{ route('conductor.solicitudes-cambio-ruta') }}" method="POST" class="form-content">
-                @csrf
-
+            <form action="#" method="POST" class="form-content">
                 <!-- Sección: Conductor y Vehículo -->
                 <div class="form-section">
                     <h3 class="section-title">
@@ -331,11 +329,8 @@
                             </label>
                             <select name="id_conductor" required class="form-select">
                                 <option value="">Seleccionar conductor...</option>
-                                @foreach($conductores as $conductor)
-                                    <option value="{{ $conductor->id_conductor }}">
-                                        {{ $conductor->primer_nombre }} {{ $conductor->primer_apellido }} - {{ $conductor->tipo_documento }} {{ $conductor->numero_documento }}
-                                    </option>
-                                @endforeach
+                                <option value="1">Juan Pérez - CC 123456789</option>
+                                <option value="2">María López - CC 987654321</option>
                             </select>
                         </div>
 
@@ -345,11 +340,8 @@
                             </label>
                             <select name="id_vehiculo" required class="form-select">
                                 <option value="">Seleccionar vehículo...</option>
-                                @foreach($vehiculos as $vehiculo)
-                                    <option value="{{ $vehiculo->id_vehiculo }}">
-                                        {{ $vehiculo->placa }} - {{ $vehiculo->marca ?? '' }} {{ $vehiculo->modelo ?? '' }}
-                                    </option>
-                                @endforeach
+                                <option value="1">ABC123 - Toyota Corolla</option>
+                                <option value="2">XYZ789 - Chevrolet Spark</option>
                             </select>
                         </div>
                     </div>
@@ -390,6 +382,12 @@
                         Origen y Destino
                     </h3>
                     
+                    <!-- CAMPO AGREGADO: Origen Actual -->
+                    <div class="form-group">
+                        <label class="form-label">Origen Actual <span class="required">*</span></label>
+                        <textarea name="origen_actual" required placeholder="Ubicación actual del conductor o punto de partida" class="form-textarea" rows="2"></textarea>
+                    </div>
+
                     <div class="form-group">
                         <label class="form-label">Dirección de Origen <span class="required">*</span></label>
                         <textarea name="direccion_origen" required placeholder="Dirección completa de recogida" class="form-textarea" rows="2"></textarea>
@@ -429,7 +427,7 @@
 
                 <!-- Botones de Acción -->
                 <div class="form-actions">
-                    <button type="button" onclick="window.location.href='{{ route('conductor.dashboard') }}'" class="btn btn-cancelar">
+                    <button type="button" onclick="alert('Cancelado')" class="btn btn-cancelar">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                         </svg>
@@ -446,51 +444,31 @@
         </div>
     </div>
 
-    @if(session('success'))
-    <div class="alert alert-success">
-        <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-        </svg>
-        {{ session('success') }}
-    </div>
-    @endif
-
-    @if($errors->any())
-    <div class="alert alert-error">
-        <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-        </svg>
-        {{ $errors->first() }}
-    </div>
-    @endif
-
     <script>
         document.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
             const requiredFields = this.querySelectorAll('[required]');
             let isValid = true;
+            let emptyFields = [];
 
             requiredFields.forEach(field => {
                 if (!field.value.trim()) {
                     isValid = false;
                     field.style.borderColor = '#f44336';
+                    const label = field.closest('.form-group').querySelector('.form-label').textContent.trim();
+                    emptyFields.push(label);
                 } else {
                     field.style.borderColor = '#e0e0e0';
                 }
             });
 
             if (!isValid) {
-                e.preventDefault();
-                alert('Por favor complete todos los campos obligatorios');
+                alert('Por favor complete todos los campos obligatorios:\n\n' + emptyFields.join('\n'));
+            } else {
+                alert('✅ Formulario válido! Todos los campos están completos.');
             }
         });
-
-        setTimeout(function() {
-            const alerts = document.querySelectorAll('.alert');
-            alerts.forEach(alert => {
-                alert.style.opacity = '0';
-                setTimeout(() => alert.remove(), 300);
-            });
-        }, 5000);
     </script>
 </body>
 </html>

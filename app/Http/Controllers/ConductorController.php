@@ -25,7 +25,6 @@ class ConductorController extends Controller
             return null;
         }
         
-        // Busca por email (columna en tabla conductores)
         return Conductor::where('email', $user->correo)->first();
     }
 
@@ -121,7 +120,6 @@ class ConductorController extends Controller
 
     public function mantenimientoGeneral()
     {
-        // Sin filtro de 'activo' - ajusta según tu tabla
         $mantenimientos = MantenimientoGeneral::orderBy('nombre', 'asc')
             ->paginate(20);
 
@@ -131,62 +129,57 @@ class ConductorController extends Controller
     // ✅ MÉTODO PARA MOSTRAR EL FORMULARIO DE NUEVA SOLICITUD
     public function nuevaSolicitudCambioRuta()
     {
-        // Filtramos conductores activos usando la columna 'estado'
         $conductores = Conductor::where('estado', 'activo')
             ->orderBy('primer_nombre')
             ->orderBy('primer_apellido')
             ->get();
         
-        // Filtramos vehículos activos - ajusta según tu estructura de tabla vehiculos
         $vehiculos = Vehiculo::orderBy('placa')->get();
         
         return view('conductor.solicitudes-cambio-ruta', compact('conductores', 'vehiculos'));
     }
 
-    // ✅ MÉTODO PARA GUARDAR LA SOLICITUD
+    // ✅ AQUÍ VA EL MÉTODO storeSolicitudCambioRuta - DESPUÉS DE nuevaSolicitudCambioRuta
     public function storeSolicitudCambioRuta(Request $request)
     {
         $validated = $request->validate([
             'id_conductor' => 'required|exists:conductores,id_conductor',
             'id_vehiculo' => 'required|exists:vehiculos,id_vehiculo',
-            'origen_actual' => 'required|string|max:255',
-            'destino_actual' => 'required|string|max:255',
-            'codigo_ruta_actual' => 'required|string|max:50',
-            'nuevo_origen' => 'required|string|max:255',
-            'nuevo_destino' => 'required|string|max:255',
-            'codigo_nueva_ruta' => 'required|string|max:50',
-            'motivo' => 'required|string',
-            'fecha_efectiva' => 'required|date',
-            'documentos.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120'
+            'nombre_contratante' => 'required|string|max:200',
+            'documento_contratante' => 'required|string|max:50',
+            'telefono_contratante' => 'required|string|max:20',
+            'direccion_origen' => 'required|string',
+            'direccion_destino' => 'required|string',
+            'fecha_viaje_programada' => 'nullable|date',
+            'numero_pasajeros' => 'nullable|integer|min:1',
+            'tarifa_cobrada' => 'nullable|numeric|min:0',
         ]);
 
         try {
+            // Buscar una tarifa por defecto (la primera activa)
+            $tarifaDefault = TarifaDestino::first();
+            
+            if (!$tarifaDefault) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'No hay tarifas configuradas en el sistema');
+            }
+
             // Guardar la solicitud
             $solicitud = SolicitudCambioRuta::create([
                 'id_conductor' => $validated['id_conductor'],
                 'id_vehiculo' => $validated['id_vehiculo'],
-                'origen_actual' => $validated['origen_actual'],
-                'destino_actual' => $validated['destino_actual'],
-                'codigo_ruta_actual' => $validated['codigo_ruta_actual'],
-                'nuevo_origen' => $validated['nuevo_origen'],
-                'nuevo_destino' => $validated['nuevo_destino'],
-                'codigo_nueva_ruta' => $validated['codigo_nueva_ruta'],
-                'motivo' => $validated['motivo'],
-                'fecha_efectiva' => $validated['fecha_efectiva'],
+                'id_tarifa_destino' => $tarifaDefault->id_tarifa,
+                'nombre_contratante' => $validated['nombre_contratante'],
+                'documento_contratante' => $validated['documento_contratante'],
+                'telefono_contratante' => $validated['telefono_contratante'],
+                'direccion_origen' => $validated['direccion_origen'],
+                'direccion_destino' => $validated['direccion_destino'],
+                'fecha_viaje_programada' => $validated['fecha_viaje_programada'] ?? now()->addHour(),
+                'numero_pasajeros' => $validated['numero_pasajeros'] ?? 1,
+                'tarifa_cobrada' => $validated['tarifa_cobrada'] ?? $tarifaDefault->tarifa,
                 'fecha_solicitud' => now(),
-                'estado' => 'Pendiente',
             ]);
-
-            // Manejar archivos adjuntos si existen
-            if ($request->hasFile('documentos')) {
-                foreach ($request->file('documentos') as $documento) {
-                    $nombreArchivo = time() . '_' . uniqid() . '.' . $documento->getClientOriginalExtension();
-                    $ruta = $documento->storeAs('solicitudes/documentos', $nombreArchivo, 'public');
-                    
-                    // Si tienes una tabla de documentos, guárdala aquí
-                    // DocumentoSolicitud::create(['id_solicitud' => $solicitud->id, 'ruta' => $ruta]);
-                }
-            }
 
             return redirect()->route('conductor.dashboard')
                 ->with('success', '✅ Solicitud enviada correctamente');
@@ -200,7 +193,6 @@ class ConductorController extends Controller
 
     public function propietarios()
     {
-        // Sin filtro de 'activo' - ajusta según tu tabla propietarios
         $propietarios = Propietario::withCount('vehiculos')
             ->orderBy('razon_social', 'asc')
             ->paginate(20);
@@ -211,7 +203,6 @@ class ConductorController extends Controller
   
     public function tarifas()
     {
-        // Sin filtro de 'activa' - ajusta según tu tabla tarifas_destino
         $tarifas = TarifaDestino::orderBy('nombre_destino', 'asc')
             ->paginate(20);
 
