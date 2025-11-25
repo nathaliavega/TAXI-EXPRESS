@@ -160,13 +160,13 @@
             <div class="alert-box alert-success">✅ {{ session('success') }}</div>
         @endif
         @if(session('error') || isset($error))
-            <div class="alert-box alert-error">⚠️ {{ session('error') ?? $error }}</div>
+            <div class="alert-box alert-error">⚠ {{ session('error') ?? $error }}</div>
         @endif
 
         {{-- Menú de Navegación (SIN Vehículos ni Conductores) --}}
         <div class="menu-nav">
             <a href="{{ route('conductor.mis-turnos') }}">📅 Mis Turnos</a>
-            <a href="{{ route('conductor.alertas') }}">⚠️ Alertas</a>
+            <a href="{{ route('conductor.alertas') }}">⚠ Alertas</a>
             <a href="{{ route('conductor.solicitudes-cambio-ruta') }}">📝 Solicitudes Ruta</a>
             <a href="{{ route('conductor.tarifas') }}">💰 Tarifas</a>
             <a href="{{ route('conductor.mantenimiento-general') }}">🔧 Mantenimientos</a>
@@ -195,7 +195,7 @@
                 <div class="number">{{ $solicitudesPendientes ?? 0 }}</div>
             </div>
             <div class="stat-card alertas">
-                <h3>⚠️ Alertas Sin Resolver</h3>
+                <h3>⚠ Alertas Sin Resolver</h3>
                 <div class="number">{{ isset($alertas) ? $alertas->count() : 0 }}</div>
             </div>
         </div>
@@ -226,7 +226,7 @@
         {{-- Alertas --}}
         @if(isset($alertas) && $alertas->count() > 0)
             <div class="section">
-                <h2>⚠️ Mis Alertas Pendientes</h2>
+                <h2>⚠ Mis Alertas Pendientes</h2>
                 @foreach($alertas as $alerta)
                     <div class="alerta-item {{ strtolower($alerta->prioridad) }}">
                         <strong>{{ $alerta->titulo }}</strong>

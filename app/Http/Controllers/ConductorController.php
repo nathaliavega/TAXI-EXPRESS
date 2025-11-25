@@ -3,162 +3,128 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\SolicitudCambioRuta;
+use App\Models\TurnoObligatorio;
+use App\Models\Alerta;
 use App\Models\Conductor;
-use App\Models\Vehiculo;
-use App\Models\User;
+use App\Models\MantenimientoGeneral;
+use App\Models\SolicitudCambioRuta;
+use App\Models\Propietario;
+use App\Models\TarifaDestino;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class ConductorController extends Controller
 {
     /**
-     * Dashboard del conductor
+     * Obtener el conductor autenticado por EMAIL
+     */
+    private function getConductorAutenticado()
+    {
+        $user = Auth::user();
+        
+        if (!$user) {
+            return null;
+        }
+        
+        // Buscar conductor por email (el correo del usuario = email del conductor)
+        return Conductor::where('email', $user->correo)->first();
+    }
+
+    /**
+     * Dashboard principal del conductor
      */
     public function dashboard()
     {
-        // ✅ Obtener el usuario autenticado
-        $usuario = auth()->user();
-        
-        // ✅ Usar directamente los datos del usuario como conductor
-        $conductor = (object)[
-            'primer_nombre' => $usuario->nombre ?? 'Usuario',
-            'segundo_nombre' => '',
-            'primer_apellido' => $usuario->Apellido ?? '',
-            'segundo_apellido' => '',
-            'tipo_documento' => 'CC',
-            'numero_documento' => 'N/A',
-            'telefono' => 'N/A',
-            'celular' => 'N/A',
-            'email' => $usuario->correo ?? 'N/A',
-            'licencia' => 'N/A',
-            'categoria' => 'N/A',
-            'estado' => $usuario->activo ? 'Activo' : 'Inactivo',
-        ];
-        
-        // ✅ Usar el id_usuario para todas las consultas
-        $estadisticas = [
-            'solicitudes_pendientes' => SolicitudCambioRuta::where('id_conductor', $usuario->id_usuario)
-                ->where('estado', 'pendiente')
-                ->count(),
-            'solicitudes_aprobadas' => SolicitudCambioRuta::where('id_conductor', $usuario->id_usuario)
-                ->where('estado', 'aprobado')
-                ->count(),
-            'solicitudes_rechazadas' => SolicitudCambioRuta::where('id_conductor', $usuario->id_usuario)
-                ->where('estado', 'rechazado')
-                ->count(),
-            'total_solicitudes' => SolicitudCambioRuta::where('id_conductor', $usuario->id_usuario)
-                ->count(),
-        ];
-        
-        // ✅ Obtener últimas solicitudes
-        $ultimasSolicitudes = SolicitudCambioRuta::where('id_conductor', $usuario->id_usuario)
-            ->orderBy('fecha_solicitud', 'desc')
+        $conductor = $this->getConductorAutenticado();
+
+        if (!$conductor) {
+            return view('conductor.dashboard', [
+                'conductor' => null,
+                'turnosProximos' => collect([]),
+                'solicitudesPendientes' => 0,
+                'alertas' => collect([]),
+                'error' => 'No se encontró un perfil de conductor asociado a tu cuenta.'
+            ]);
+        }
+
+        // Obtener turnos próximos
+        $turnosProximos = TurnoObligatorio::with('vehiculo')
+            ->where('id_conductor', $conductor->id_conductor)
+            ->whereDate('fecha_turno', '>=', Carbon::today())
+            ->orderBy('fecha_turno', 'asc')
             ->limit(5)
             ->get();
-        
-        return view('conductor.dashboard', compact('conductor', 'usuario', 'estadisticas', 'ultimasSolicitudes'));
+
+        // Contar solicitudes pendientes
+        $solicitudesPendientes = SolicitudCambioRuta::where('id_conductor', $conductor->id_conductor)
+            ->whereNull('autorizado_por')
+            ->count();
+
+        // Obtener alertas sin resolver
+        $alertas = Alerta::where('id_conductor', $conductor->id_conductor)
+            ->where('resuelta', false)
+            ->orderByRaw("CASE 
+                WHEN prioridad = 'critica' THEN 1 
+                WHEN prioridad = 'alta' THEN 2 
+                WHEN prioridad = 'media' THEN 3 
+                ELSE 4 END")
+            ->orderBy('fecha_alerta', 'desc')
+            ->limit(5)
+            ->get();
+
+        return view('conductor.dashboard', compact(
+            'conductor',
+            'turnosProximos',
+            'solicitudesPendientes',
+            'alertas'
+        ));
     }
 
     /**
-     * Mostrar el formulario de nueva solicitud
-     */
-    public function solicitudesCambioRuta()
-    {
-        $conductores = Conductor::all();
-        $vehiculos = Vehiculo::all();
-        
-        return view('conductor.solicitudes-cambio-ruta', compact('conductores', 'vehiculos'));
-    }
-    
-    /**
-     * Guardar la nueva solicitud
-     */
-    public function storeSolicitudCambioRuta(Request $request)
-    {
-        $validated = $request->validate([
-            'id_conductor' => 'required',
-            'id_vehiculo' => 'required|exists:vehiculos,id_vehiculo',
-            'nombre_contratante' => 'required|string|max:200',
-            'documento_contratante' => 'required|string|max:50',
-            'telefono_contratante' => 'required|string|max:20',
-            'direccion_origen' => 'required|string',
-            'direccion_destino' => 'required|string',
-            'fecha_viaje_programada' => 'nullable|date',
-            'numero_pasajeros' => 'nullable|integer|min:1',
-            'tarifa_cobrada' => 'required|numeric|min:0',
-        ]);
-
-        // ✅ Usar el id_usuario del usuario autenticado
-        $usuario = auth()->user();
-        
-        // Validación para evitar duplicados
-        $solicitudExistente = SolicitudCambioRuta::where('id_conductor', $usuario->id_usuario)
-            ->where('id_vehiculo', $validated['id_vehiculo'])
-            ->where('estado', 'pendiente')
-            ->first();
-
-        if ($solicitudExistente) {
-            return back()->withErrors([
-                'error' => 'Ya existe una solicitud activa para este conductor y vehículo.'
-            ])->withInput();
-        }
-
-        try {
-            SolicitudCambioRuta::create([
-                'id_conductor' => $usuario->id_usuario, // ✅ Usar el id_usuario
-                'id_vehiculo' => $validated['id_vehiculo'],
-                'id_tarifa_destino' => null,
-                'fecha_solicitud' => now(),
-                'fecha_viaje_programada' => $validated['fecha_viaje_programada'],
-                'nombre_contratante' => $validated['nombre_contratante'],
-                'documento_contratante' => $validated['documento_contratante'],
-                'telefono_contratante' => $validated['telefono_contratante'],
-                'direccion_origen' => $validated['direccion_origen'],
-                'direccion_destino' => $validated['direccion_destino'],
-                'numero_pasajeros' => $validated['numero_pasajeros'] ?? 1,
-                'tarifa_cobrada' => $validated['tarifa_cobrada'],
-                'estado' => 'pendiente',
-            ]);
-
-            return redirect()->route('conductor.dashboard')
-                ->with('success', '✅ Solicitud creada exitosamente');
-                
-        } catch (\Exception $e) {
-            return back()->withErrors([
-                'error' => 'Error al crear la solicitud: ' . $e->getMessage()
-            ])->withInput();
-        }
-    }
-
-    /**
-     * Mostrar los turnos del conductor
+     * Mis Turnos
      */
     public function misTurnos()
     {
-        $usuario = auth()->user();
-        
-        // Si tienes modelo Turno
-        // $turnos = Turno::where('id_conductor', $usuario->id_usuario)->get();
-        $turnos = [];
-        
+        $conductor = $this->getConductorAutenticado();
+
+        if (!$conductor) {
+            return redirect()->route('conductor.dashboard')
+                ->with('error', 'No se encontró información del conductor');
+        }
+
+        $turnos = TurnoObligatorio::with(['vehiculo', 'conductor', 'asignadoPor'])
+            ->where('id_conductor', $conductor->id_conductor)
+            ->whereDate('fecha_turno', '>=', Carbon::today())
+            ->orderBy('fecha_turno', 'asc')
+            ->paginate(20);
+
         return view('conductor.mis-turnos', compact('turnos'));
     }
 
     /**
-     * Mostrar alertas del conductor
+     * Alertas del conductor
      */
     public function alertas()
     {
-        $alertas = [];
-        return view('conductor.alertas', compact('alertas'));
-    }
+        $conductor = $this->getConductorAutenticado();
 
-    /**
-     * Listado de conductores
-     */
-    public function conductores()
-    {
-        $conductores = Conductor::all();
-        return view('conductor.conductores', compact('conductores'));
+        if (!$conductor) {
+            return redirect()->route('conductor.dashboard')
+                ->with('error', 'No se encontró información del conductor');
+        }
+
+        $alertas = Alerta::with(['vehiculo', 'conductor'])
+            ->where('id_conductor', $conductor->id_conductor)
+            ->orderBy('resuelta', 'asc')
+            ->orderByRaw("CASE 
+                WHEN prioridad = 'critica' THEN 1 
+                WHEN prioridad = 'alta' THEN 2 
+                WHEN prioridad = 'media' THEN 3 
+                ELSE 4 END")
+            ->orderBy('fecha_alerta', 'desc')
+            ->paginate(20);
+
+        return view('conductor.alertas', compact('alertas'));
     }
 
     /**
@@ -166,24 +132,60 @@ class ConductorController extends Controller
      */
     public function mantenimientoGeneral()
     {
-        return view('conductor.mantenimiento-general');
+        $mantenimientos = MantenimientoGeneral::where('activo', true)
+            ->orderBy('nombre', 'asc')
+            ->paginate(20);
+
+        return view('conductor.mantenimiento-general', compact('mantenimientos'));
     }
 
     /**
-     * Tarifas disponibles
+     * Solicitudes de cambio de ruta
+     */
+    public function solicitudesCambioRuta()
+    {
+        $conductor = $this->getConductorAutenticado();
+
+        if (!$conductor) {
+            return redirect()->route('conductor.dashboard')
+                ->with('error', 'No se encontró información del conductor');
+        }
+
+        $solicitudes = SolicitudCambioRuta::with([
+            'conductor',
+            'vehiculo',
+            'tarifaDestino',
+            'autorizadoPor'
+        ])
+        ->where('id_conductor', $conductor->id_conductor)
+        ->orderBy('fecha_solicitud', 'desc')
+        ->paginate(20);
+
+        return view('conductor.solicitudes-cambio-ruta', compact('solicitudes'));
+    }
+
+    /**
+     * Lista de propietarios
+     */
+    public function propietarios()
+    {
+        $propietarios = Propietario::where('activo', true)
+            ->withCount('vehiculos')
+            ->orderBy('razon_social', 'asc')
+            ->paginate(20);
+
+        return view('conductor.propietarios', compact('propietarios'));
+    }
+
+    /**
+     * Tarifas de destino
      */
     public function tarifas()
     {
-        $tarifas = [];
-        return view('conductor.tarifas', compact('tarifas'));
-    }
+        $tarifas = TarifaDestino::where('activa', true)
+            ->orderBy('nombre_destino', 'asc')
+            ->paginate(20);
 
-    /**
-     * Listado de vehículos
-     */
-    public function vehiculos()
-    {
-        $vehiculos = Vehiculo::all();
-        return view('conductor.vehiculos', compact('vehiculos'));
+        return view('conductor.tarifas', compact('tarifas'));
     }
 }
