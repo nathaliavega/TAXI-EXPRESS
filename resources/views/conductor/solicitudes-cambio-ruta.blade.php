@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solicitudes Cambio Ruta</title>
+    <title>Solicitudes de Servicio - TAXI EXPRESS</title>
     <style>
         * {
             margin: 0;
@@ -298,7 +298,7 @@
         </div>
     </div>
 
-    <a href="#" class="btn-volver">
+    <a href="{{ route('conductor.dashboard') }}" class="btn-volver">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
         </svg>
@@ -312,7 +312,8 @@
                 <p>Completa el formulario para solicitar un servicio de taxi</p>
             </div>
 
-            <form action="#" method="POST" class="form-content">
+            <form action="{{ route('conductor.solicitudes-cambio-ruta') }}" method="POST" class="form-content">
+                @csrf
                 <!-- Sección: Conductor y Vehículo -->
                 <div class="form-section">
                     <h3 class="section-title">
@@ -329,8 +330,7 @@
                             </label>
                             <select name="id_conductor" required class="form-select">
                                 <option value="">Seleccionar conductor...</option>
-                                <option value="1">Juan Pérez - CC 123456789</option>
-                                <option value="2">María López - CC 987654321</option>
+                                <!-- Los datos de conductores vendrán del backend Laravel -->
                             </select>
                         </div>
 
@@ -340,8 +340,7 @@
                             </label>
                             <select name="id_vehiculo" required class="form-select">
                                 <option value="">Seleccionar vehículo...</option>
-                                <option value="1">ABC123 - Toyota Corolla</option>
-                                <option value="2">XYZ789 - Chevrolet Spark</option>
+                                <!-- Los datos de vehículos vendrán del backend Laravel -->
                             </select>
                         </div>
                     </div>
@@ -390,12 +389,12 @@
 
                     <div class="form-group">
                         <label class="form-label">Dirección de Origen <span class="required">*</span></label>
-                        <textarea name="direccion_origen" required placeholder="Dirección completa de recogida" class="form-textarea" rows="2"></textarea>
+                        <textarea name="direccion_origen" required placeholder="Dirección completa de recogida del pasajero" class="form-textarea" rows="2"></textarea>
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">Dirección de Destino <span class="required">*</span></label>
-                        <textarea name="direccion_destino" required placeholder="Dirección completa de destino" class="form-textarea" rows="2"></textarea>
+                        <textarea name="direccion_destino" required placeholder="Dirección completa de destino final" class="form-textarea" rows="2"></textarea>
                     </div>
                 </div>
 
@@ -427,7 +426,7 @@
 
                 <!-- Botones de Acción -->
                 <div class="form-actions">
-                    <button type="button" onclick="alert('Cancelado')" class="btn btn-cancelar">
+                    <button type="button" onclick="window.location.href='{{ route('conductor.dashboard') }}'" class="btn btn-cancelar">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                         </svg>
@@ -444,9 +443,26 @@
         </div>
     </div>
 
+    @if(session('success'))
+    <div class="alert alert-success">
+        <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+        {{ session('success') }}
+    </div>
+    @endif
+
+    @if($errors->any())
+    <div class="alert alert-error">
+        <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+        {{ $errors->first() }}
+    </div>
+    @endif
+
     <script>
         document.querySelector('form').addEventListener('submit', function(e) {
-            e.preventDefault();
             
             const requiredFields = this.querySelectorAll('[required]');
             let isValid = true;
