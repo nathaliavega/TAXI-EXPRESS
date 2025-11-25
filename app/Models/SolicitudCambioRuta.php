@@ -28,6 +28,10 @@ class SolicitudCambioRuta extends Model
         'fecha_solicitud' => 'datetime',
         'fecha_respuesta' => 'datetime'
     ];
+    public function vehiculo()
+    {
+        return $this->belongsTo(Vehiculo::class, 'id_vehiculo', 'id_vehiculo');
+    }
 
     public function conductor()
     {
