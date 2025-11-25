@@ -59,21 +59,20 @@ Route::middleware(['auth'])->group(function () {
     });
     
     // Conductores
-    Route::middleware(['auth'])->prefix('conductor')->name('conductor.')->group(function () {
-        Route::get('/dashboard', [ConductorController::class, 'dashboard'])->name('dashboard');
-        Route::get('/mis-turnos', [ConductorController::class, 'misTurnos'])->name('mis-turnos');
-        Route::get('/alertas', [ConductorController::class, 'alertas'])->name('alertas');
-        Route::get('/conductores', [ConductorController::class, 'conductores'])->name('conductores');
-        Route::get('/mantenimiento-general', [ConductorController::class, 'mantenimientoGeneral'])->name('mantenimiento-general');
-        
-        // ✅ RUTAS ACTUALIZADAS PARA SOLICITUDES DE CAMBIO DE RUTA
-        // Ruta GET para mostrar el formulario de nueva solicitud
-        Route::get('/solicitudes-cambio-ruta', [ConductorController::class, 'nuevaSolicitudCambioRuta'])->name('solicitudes-cambio-ruta');
-        
-        // Ruta POST para guardar la nueva solicitud
-        Route::post('/solicitudes-cambio-ruta', [ConductorController::class, 'storeSolicitudCambioRuta'])->name('solicitudes.store');
-        
-        Route::get('/tarifas', [ConductorController::class, 'tarifas'])->name('tarifas');
-        Route::get('/vehiculos', [ConductorController::class, 'vehiculos'])->name('vehiculos');
-    });
+Route::middleware(['auth'])->prefix('conductor')->name('conductor.')->group(function () {
+    Route::get('/dashboard', [ConductorController::class, 'dashboard'])->name('dashboard');
+    Route::get('/mis-turnos', [ConductorController::class, 'misTurnos'])->name('mis-turnos');
+    Route::get('/alertas', [ConductorController::class, 'alertas'])->name('alertas');
+    Route::get('/conductores', [ConductorController::class, 'conductores'])->name('conductores');
+    Route::get('/mantenimiento-general', [ConductorController::class, 'mantenimientoGeneral'])->name('mantenimiento-general');
+    
+    // Solicitudes de cambio de ruta
+    Route::get('/solicitudes-cambio-ruta', [ConductorController::class, 'solicitudesCambioRuta'])
+        ->name('solicitudes-cambio-ruta');
+    Route::post('/solicitudes-cambio-ruta', [ConductorController::class, 'storeSolicitudCambioRuta'])
+        ->name('solicitudes-cambio-ruta.store');
+    
+    Route::get('/tarifas', [ConductorController::class, 'tarifas'])->name('tarifas');
+    Route::get('/vehiculos', [ConductorController::class, 'vehiculos'])->name('vehiculos');
+});
 });
