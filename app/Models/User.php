@@ -40,6 +40,12 @@ class User extends Authenticatable
         return 'contrasena';
     }
 
+    // ✅ RELACIÓN CON CONDUCTOR
+    public function conductor()
+    {
+        return $this->hasOne(Conductor::class, 'id_usuario', 'id_usuario');
+    }
+
     // ✅ MÉTODOS HELPER PARA VERIFICAR ROLES
     
     /**
@@ -78,5 +84,13 @@ class User extends Authenticatable
         ];
 
         return $roles[$this->id_rol] ?? 'Desconocido';
+    }
+
+    /**
+     * Obtener nombre completo
+     */
+    public function getNombreCompletoAttribute()
+    {
+        return trim($this->nombre . ' ' . $this->Apellido);
     }
 }
