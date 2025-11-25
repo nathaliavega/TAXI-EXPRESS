@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solicitud Cambio de Ruta - TAXI EXPRESS</title>
+    <title>Solicitud cambio Ruta - TAXI EXPRESS</title>
     <style>
         * {
             margin: 0;
@@ -81,7 +81,6 @@
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             overflow: hidden;
-            margin-bottom: 30px;
         }
 
         .form-header {
@@ -179,25 +178,6 @@
             min-height: 100px;
         }
 
-        .form-input.error,
-        .form-select.error,
-        .form-textarea.error {
-            border-color: #f44336;
-        }
-
-        .info-box {
-            background: #e3f2fd;
-            border-left: 4px solid #2196f3;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-
-        .info-box p {
-            margin: 5px 0;
-            color: #1565c0;
-        }
-
         .form-actions {
             display: flex;
             gap: 15px;
@@ -280,50 +260,11 @@
             }
         }
 
-        /* Tabla de solicitudes */
-        .solicitudes-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        .solicitudes-table thead {
-            background: #f5f5f5;
-        }
-
-        .solicitudes-table th,
-        .solicitudes-table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        .solicitudes-table th {
-            font-weight: 600;
-            color: #333;
-        }
-
-        .estado-badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            display: inline-block;
-        }
-
-        .estado-pendiente {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .estado-aprobada {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .estado-rechazada {
-            background: #f8d7da;
-            color: #721c24;
+        /* ✅ Estilos para campos con error de validación */
+        .form-input.error,
+        .form-select.error,
+        .form-textarea.error {
+            border-color: #f44336;
         }
 
         @media (max-width: 768px) {
@@ -360,15 +301,6 @@
                 left: 5%;
                 right: 5%;
             }
-
-            .solicitudes-table {
-                font-size: 14px;
-            }
-
-            .solicitudes-table th,
-            .solicitudes-table td {
-                padding: 8px;
-            }
         }
     </style>
 </head>
@@ -388,74 +320,125 @@
     </a>
 
     <div class="container">
-        <!-- Formulario para Nueva Solicitud -->
         <div class="form-card">
             <div class="form-header">
-                <h2>Nueva Solicitud de Cambio de Ruta</h2>
-                <p>Solicita cambiar tu ruta asignada actual por una nueva</p>
+                <h2>Nueva Solicitud de Servicio</h2>
+                <p>Completa el formulario para solicitar un servicio de taxi</p>
             </div>
 
-            <form action="{{ route('conductor.solicitudes-cambio-ruta.store') }}" method="POST" class="form-content" id="solicitudForm">
+            {{-- ✅ CAMBIO IMPORTANTE: Actualizar action para usar la ruta .store --}}
+            <form action="{{ route('conductor.solicitudes-cambio-ruta') }}" method="POST" class="form-content" id="solicitudForm">
                 @csrf
                 
-                <!-- Información Actual -->
+                <!-- Sección: Conductor y Vehículo -->
                 <div class="form-section">
                     <h3 class="section-title">
                         <svg class="section-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                         </svg>
-                        Tu Información Actual
+                        Información del Conductor y Vehículo
                     </h3>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">
+                                Conductor <span class="required">*</span>
+                            </label>
+                            <select name="id_conductor" required class="form-select" value="{{ old('id_conductor') }}">
+                                <option value="">Seleccionar conductor...</option>
+                                @foreach($conductores as $conductor)
+                                    <option value="{{ $conductor->id_conductor }}" {{ old('id_conductor') == $conductor->id_conductor ? 'selected' : '' }}>
+                                        {{ $conductor->primer_nombre }} {{ $conductor->primer_apellido }} 
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
 
-                    <div class="info-box">
-                        <p><strong>Conductor:</strong> {{ $conductor->primer_nombre }} {{ $conductor->primer_apellido }}</p>
-                        <p><strong>Vehículo:</strong> {{ $conductor->vehiculo->placa ?? 'No asignado' }}</p>
-                        @if($conductor->vehiculo && $conductor->vehiculo->tarifaDestino)
-                            <p><strong>Ruta Actual:</strong> {{ $conductor->vehiculo->tarifaDestino->nombre_destino }}</p>
-                        @else
-                            <p><strong>Ruta Actual:</strong> Sin ruta asignada</p>
-                        @endif
+                        <div class="form-group">
+                            <label class="form-label">
+                                Vehículo <span class="required">*</span>
+                            </label>
+                            <select name="id_vehiculo" required class="form-select" value="{{ old('id_vehiculo') }}">
+                                <option value="">Seleccionar vehículo...</option>
+                                @foreach($vehiculos as $vehiculo)
+                                    <option value="{{ $vehiculo->id_vehiculo }}" {{ old('id_vehiculo') == $vehiculo->id_vehiculo ? 'selected' : '' }}>
+                                        {{ $vehiculo->placa }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Selección de Nueva Ruta -->
+                <!-- Sección: Información del Contratante -->
                 <div class="form-section">
                     <h3 class="section-title">
                         <svg class="section-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                         </svg>
-                        Nueva Ruta Solicitada
+                        Datos del Contratante
                     </h3>
                     
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Nombre Completo <span class="required">*</span></label>
+                            <input type="text" name="nombre_contratante" required placeholder="Nombre completo del cliente" class="form-input" value="{{ old('nombre_contratante') }}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Documento <span class="required">*</span></label>
+                            <input type="text" name="documento_contratante" required placeholder="Número de documento" class="form-input" value="{{ old('documento_contratante') }}">
+                        </div>
+                    </div>
+
                     <div class="form-group">
-                        <label class="form-label">
-                            Selecciona la nueva ruta <span class="required">*</span>
-                        </label>
-                        <select name="id_tarifa_solicitada" required class="form-select">
-                            <option value="">Seleccionar ruta/destino...</option>
-                            @foreach($tarifas as $tarifa)
-                                <option value="{{ $tarifa->id_tarifa }}" {{ old('id_tarifa_solicitada') == $tarifa->id_tarifa ? 'selected' : '' }}>
-                                    {{ $tarifa->nombre_destino }} - ${{ number_format($tarifa->tarifa, 2) }}
-                                </option>
-                            @endforeach
-                        </select>
+                        <label class="form-label">Teléfono <span class="required">*</span></label>
+                        <input type="tel" name="telefono_contratante" required placeholder="Número de contacto" class="form-input" value="{{ old('telefono_contratante') }}">
                     </div>
                 </div>
 
-                <!-- Motivo de la Solicitud -->
+                <!-- Sección: Direcciones -->
                 <div class="form-section">
                     <h3 class="section-title">
                         <svg class="section-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                         </svg>
-                        Motivo del Cambio
+                        Origen y Destino
                     </h3>
                     
                     <div class="form-group">
-                        <label class="form-label">
-                            Explica por qué solicitas este cambio <span class="required">*</span>
-                        </label>
-                        <textarea name="motivo" required placeholder="Ejemplo: Cambio de residencia, mejor conocimiento de la zona, solicitud de cliente frecuente..." class="form-textarea" rows="4">{{ old('motivo') }}</textarea>
+                        <label class="form-label">Dirección de Origen <span class="required">*</span></label>
+                        <textarea name="direccion_origen" required placeholder="Dirección completa de recogida del pasajero" class="form-textarea" rows="2">{{ old('direccion_origen') }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Dirección de Destino <span class="required">*</span></label>
+                        <textarea name="direccion_destino" required placeholder="Dirección completa de destino final" class="form-textarea" rows="2">{{ old('direccion_destino') }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Sección: Detalles del Servicio (OPCIONAL) -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <svg class="section-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Detalles del Servicio (Opcional)
+                    </h3>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Fecha y Hora Programada</label>
+                            <input type="datetime-local" name="fecha_viaje_programada" class="form-input" value="{{ old('fecha_viaje_programada') }}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Número de Pasajeros</label>
+                            <input type="number" name="numero_pasajeros" min="1" value="{{ old('numero_pasajeros', 1) }}" class="form-input">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Tarifa a Cobrar</label>
+                        <input type="number" name="tarifa_cobrada" step="0.01" placeholder="0.00" class="form-input" value="{{ old('tarifa_cobrada') }}">
                     </div>
                 </div>
 
@@ -476,51 +459,9 @@
                 </div>
             </form>
         </div>
-
-        <!-- Historial de Solicitudes -->
-        @if($solicitudes->count() > 0)
-        <div class="form-card">
-            <div class="form-header">
-                <h2>Mis Solicitudes Anteriores</h2>
-                <p>Historial de solicitudes de cambio de ruta</p>
-            </div>
-
-            <div class="form-content">
-                <table class="solicitudes-table">
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Ruta Actual</th>
-                            <th>Ruta Solicitada</th>
-                            <th>Estado</th>
-                            <th>Respuesta</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($solicitudes as $solicitud)
-                        <tr>
-                            <td>{{ $solicitud->fecha_solicitud->format('d/m/Y') }}</td>
-                            <td>{{ $solicitud->tarifaActual->nombre_destino ?? 'N/A' }}</td>
-                            <td>{{ $solicitud->tarifaSolicitada->nombre_destino ?? 'N/A' }}</td>
-                            <td>
-                                <span class="estado-badge estado-{{ strtolower($solicitud->estado) }}">
-                                    {{ ucfirst($solicitud->estado) }}
-                                </span>
-                            </td>
-                            <td>{{ $solicitud->respuesta_admin ?? '-' }}</td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-
-                <div style="margin-top: 20px;">
-                    {{ $solicitudes->links() }}
-                </div>
-            </div>
-        </div>
-        @endif
     </div>
 
+    {{-- ✅ Mensaje de éxito --}}
     @if(session('success'))
     <div class="alert alert-success" id="successAlert">
         <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -530,6 +471,7 @@
     </div>
     @endif
 
+    {{-- ✅ Mensajes de error --}}
     @if($errors->any())
     <div class="alert alert-error" id="errorAlert">
         <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -540,6 +482,7 @@
     @endif
 
     <script>
+        // ✅ Validación del formulario antes de enviar
         document.getElementById('solicitudForm').addEventListener('submit', function(e) {
             const requiredFields = this.querySelectorAll('[required]');
             let isValid = true;
@@ -549,20 +492,23 @@
                 if (!field.value.trim()) {
                     isValid = false;
                     field.classList.add('error');
+                    field.style.borderColor = '#f44336';
                     const label = field.closest('.form-group').querySelector('.form-label').textContent.trim();
                     emptyFields.push(label);
                 } else {
                     field.classList.remove('error');
+                    field.style.borderColor = '#e0e0e0';
                 }
             });
 
             if (!isValid) {
                 e.preventDefault();
-                alert('⚠️ Por favor complete todos los campos obligatorios:\n\n' + emptyFields.join('\n'));
+                alert('⚠ Por favor complete todos los campos obligatorios:\n\n' + emptyFields.join('\n'));
                 return false;
             }
         });
 
+        // ✅ Auto-ocultar alertas después de 5 segundos
         setTimeout(function() {
             const successAlert = document.getElementById('successAlert');
             const errorAlert = document.getElementById('errorAlert');
@@ -578,9 +524,11 @@
             }
         }, 5000);
 
+        // ✅ Limpiar estilo de error cuando el usuario empieza a escribir
         document.querySelectorAll('.form-input, .form-select, .form-textarea').forEach(field => {
             field.addEventListener('input', function() {
                 this.classList.remove('error');
+                this.style.borderColor = '#e0e0e0';
             });
         });
     </script>
