@@ -9,8 +9,11 @@ class User extends Authenticatable
 {
     use Notifiable;
 
+    // ✅ CRÍTICO: Especificar la tabla personalizada
+    protected $table = 'usuarios';
+
     protected $fillable = [
-        'name',
+        'nombre',
         'correo',
         'contrasena',
         'id_rol',
@@ -23,25 +26,22 @@ class User extends Authenticatable
     ];
 
     protected $casts = [
-        'email_verified_at' => 'datetime',
         'activo' => 'boolean',
     ];
 
-    // ✅ CRÍTICO: Decirle a Laravel qué campo usar para la contraseña
+    /**
+     * Obtener la contraseña para autenticación
+     */
     public function getAuthPassword()
     {
         return $this->contrasena;
     }
 
-    // ✅ Para recuperación de contraseña
-    public function getEmailForPasswordReset()
+    /**
+     * Obtener el nombre del campo de contraseña
+     */
+    public function getAuthPasswordName()
     {
-        return $this->correo;
-    }
-
-    // ✅ Opcional: Para poder usar $user->email en tu código
-    public function getEmailAttribute()
-    {
-        return $this->correo;
+        return 'contrasena';
     }
 }

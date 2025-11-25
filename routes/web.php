@@ -12,8 +12,9 @@ Route::get('/test-auth', function() {
     
     if (!$user) {
         return response()->json([
-            'error' => 'Usuario NO encontrado en la base de datos',
-            'correo_buscado' => 'elder.garcia@gmail.com'
+            'error' => 'Usuario NO encontrado en tabla usuarios',
+            'correo_buscado' => 'elder.garcia@gmail.com',
+            'tabla' => 'usuarios'
         ]);
     }
     
@@ -29,6 +30,7 @@ Route::get('/test-auth', function() {
         'usuario_activo' => (bool)$user->activo,
         'id_rol' => $user->id_rol,
         'password_correcto' => $passwordCheck,
+        'tabla_usada' => 'usuarios'
     ]);
 });
 
