@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class LoginController extends Controller
 {
@@ -32,22 +34,22 @@ class LoginController extends Controller
             'contrasena' => 'required',
         ]);
 
-        // ✅ CAMBIO CRÍTICO: Usar 'contrasena' en lugar de 'password'
-        if (Auth::attempt([
-            'correo' => $credentials['correo'], 
-            'contrasena' => $credentials['contrasena']
-        ])) {
-            $request->session()->regenerate();
+        // ✅ SOLUCIÓN: Autenticación manual
+        $user = User::where('correo', $credentials['correo'])->first();
 
-            $user = Auth::user();
+        // Verificar que el usuario exista y la contraseña sea correcta
+        if ($user && Hash::check($credentials['contrasena'], $user->contrasena)) {
             
             // Verificar que el usuario esté activo
             if (!$user->activo) {
-                Auth::logout();
                 return back()->withErrors([
                     'correo' => 'Tu cuenta está inactiva. Contacta al administrador.',
                 ])->onlyInput('correo');
             }
+
+            // ✅ Iniciar sesión manualmente
+            Auth::login($user, $request->boolean('remember'));
+            $request->session()->regenerate();
             
             // Redirigir según rol
             if ($user->id_rol === 1) {
