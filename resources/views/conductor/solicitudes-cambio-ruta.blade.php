@@ -238,6 +238,7 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             animation: slideIn 0.3s ease;
             z-index: 1000;
+            max-width: 400px;
         }
 
         .alert-success {
@@ -257,6 +258,13 @@
                 transform: translateX(0);
                 opacity: 1;
             }
+        }
+
+        /* ✅ Estilos para campos con error de validación */
+        .form-input.error,
+        .form-select.error,
+        .form-textarea.error {
+            border-color: #f44336;
         }
 
         @media (max-width: 768px) {
@@ -287,6 +295,12 @@
             .form-actions {
                 flex-direction: column;
             }
+
+            .alert {
+                max-width: 90%;
+                left: 5%;
+                right: 5%;
+            }
         }
     </style>
 </head>
@@ -312,8 +326,10 @@
                 <p>Completa el formulario para solicitar un servicio de taxi</p>
             </div>
 
-            <form action="{{ route('conductor.solicitudes-cambio-ruta') }}" method="POST" class="form-content">
+            {{-- ✅ CAMBIO IMPORTANTE: Actualizar action para usar la ruta .store --}}
+            <form action="{{ route('conductor.solicitudes-cambio-ruta.store') }}" method="POST" class="form-content" id="solicitudForm">
                 @csrf
+                
                 <!-- Sección: Conductor y Vehículo -->
                 <div class="form-section">
                     <h3 class="section-title">
@@ -328,10 +344,10 @@
                             <label class="form-label">
                                 Conductor <span class="required">*</span>
                             </label>
-                            <select name="id_conductor" required class="form-select">
+                            <select name="id_conductor" required class="form-select" value="{{ old('id_conductor') }}">
                                 <option value="">Seleccionar conductor...</option>
                                 @foreach($conductores as $conductor)
-                                    <option value="{{ $conductor->id_conductor }}">
+                                    <option value="{{ $conductor->id_conductor }}" {{ old('id_conductor') == $conductor->id_conductor ? 'selected' : '' }}>
                                         {{ $conductor->primer_nombre }} {{ $conductor->primer_apellido }} - {{ $conductor->tipo_documento }} {{ $conductor->numero_documento }}
                                     </option>
                                 @endforeach
@@ -342,10 +358,10 @@
                             <label class="form-label">
                                 Vehículo <span class="required">*</span>
                             </label>
-                            <select name="id_vehiculo" required class="form-select">
+                            <select name="id_vehiculo" required class="form-select" value="{{ old('id_vehiculo') }}">
                                 <option value="">Seleccionar vehículo...</option>
                                 @foreach($vehiculos as $vehiculo)
-                                    <option value="{{ $vehiculo->id_vehiculo }}">
+                                    <option value="{{ $vehiculo->id_vehiculo }}" {{ old('id_vehiculo') == $vehiculo->id_vehiculo ? 'selected' : '' }}>
                                         {{ $vehiculo->placa }} - {{ $vehiculo->marca ?? '' }} {{ $vehiculo->modelo ?? '' }}
                                     </option>
                                 @endforeach
@@ -366,17 +382,17 @@
                     <div class="form-grid">
                         <div class="form-group">
                             <label class="form-label">Nombre Completo <span class="required">*</span></label>
-                            <input type="text" name="nombre_contratante" required placeholder="Nombre completo del cliente" class="form-input">
+                            <input type="text" name="nombre_contratante" required placeholder="Nombre completo del cliente" class="form-input" value="{{ old('nombre_contratante') }}">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Documento <span class="required">*</span></label>
-                            <input type="text" name="documento_contratante" required placeholder="Número de documento" class="form-input">
+                            <input type="text" name="documento_contratante" required placeholder="Número de documento" class="form-input" value="{{ old('documento_contratante') }}">
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">Teléfono <span class="required">*</span></label>
-                        <input type="tel" name="telefono_contratante" required placeholder="Número de contacto" class="form-input">
+                        <input type="tel" name="telefono_contratante" required placeholder="Número de contacto" class="form-input" value="{{ old('telefono_contratante') }}">
                     </div>
                 </div>
 
@@ -391,12 +407,12 @@
                     
                     <div class="form-group">
                         <label class="form-label">Dirección de Origen <span class="required">*</span></label>
-                        <textarea name="direccion_origen" required placeholder="Dirección completa de recogida del pasajero" class="form-textarea" rows="2"></textarea>
+                        <textarea name="direccion_origen" required placeholder="Dirección completa de recogida del pasajero" class="form-textarea" rows="2">{{ old('direccion_origen') }}</textarea>
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">Dirección de Destino <span class="required">*</span></label>
-                        <textarea name="direccion_destino" required placeholder="Dirección completa de destino final" class="form-textarea" rows="2"></textarea>
+                        <textarea name="direccion_destino" required placeholder="Dirección completa de destino final" class="form-textarea" rows="2">{{ old('direccion_destino') }}</textarea>
                     </div>
                 </div>
 
@@ -412,17 +428,17 @@
                     <div class="form-grid">
                         <div class="form-group">
                             <label class="form-label">Fecha y Hora Programada</label>
-                            <input type="datetime-local" name="fecha_viaje_programada" class="form-input">
+                            <input type="datetime-local" name="fecha_viaje_programada" class="form-input" value="{{ old('fecha_viaje_programada') }}">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Número de Pasajeros</label>
-                            <input type="number" name="numero_pasajeros" min="1" value="1" class="form-input">
+                            <input type="number" name="numero_pasajeros" min="1" value="{{ old('numero_pasajeros', 1) }}" class="form-input">
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">Tarifa a Cobrar</label>
-                        <input type="number" name="tarifa_cobrada" step="0.01" placeholder="0.00" class="form-input">
+                        <input type="number" name="tarifa_cobrada" step="0.01" placeholder="0.00" class="form-input" value="{{ old('tarifa_cobrada') }}">
                     </div>
                 </div>
 
@@ -445,8 +461,9 @@
         </div>
     </div>
 
+    {{-- ✅ Mensaje de éxito --}}
     @if(session('success'))
-    <div class="alert alert-success">
+    <div class="alert alert-success" id="successAlert">
         <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
         </svg>
@@ -454,8 +471,9 @@
     </div>
     @endif
 
+    {{-- ✅ Mensajes de error --}}
     @if($errors->any())
-    <div class="alert alert-error">
+    <div class="alert alert-error" id="errorAlert">
         <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
         </svg>
@@ -464,8 +482,8 @@
     @endif
 
     <script>
-        document.querySelector('form').addEventListener('submit', function(e) {
-            
+        // ✅ Validación del formulario antes de enviar
+        document.getElementById('solicitudForm').addEventListener('submit', function(e) {
             const requiredFields = this.querySelectorAll('[required]');
             let isValid = true;
             let emptyFields = [];
@@ -473,19 +491,45 @@
             requiredFields.forEach(field => {
                 if (!field.value.trim()) {
                     isValid = false;
+                    field.classList.add('error');
                     field.style.borderColor = '#f44336';
                     const label = field.closest('.form-group').querySelector('.form-label').textContent.trim();
                     emptyFields.push(label);
                 } else {
+                    field.classList.remove('error');
                     field.style.borderColor = '#e0e0e0';
                 }
             });
 
             if (!isValid) {
-                alert('Por favor complete todos los campos obligatorios:\n\n' + emptyFields.join('\n'));
-            } else {
-                alert('✅ Formulario válido! Todos los campos están completos.');
+                e.preventDefault();
+                alert('⚠️ Por favor complete todos los campos obligatorios:\n\n' + emptyFields.join('\n'));
+                return false;
             }
+        });
+
+        // ✅ Auto-ocultar alertas después de 5 segundos
+        setTimeout(function() {
+            const successAlert = document.getElementById('successAlert');
+            const errorAlert = document.getElementById('errorAlert');
+            
+            if (successAlert) {
+                successAlert.style.animation = 'slideIn 0.3s ease reverse';
+                setTimeout(() => successAlert.remove(), 300);
+            }
+            
+            if (errorAlert) {
+                errorAlert.style.animation = 'slideIn 0.3s ease reverse';
+                setTimeout(() => errorAlert.remove(), 300);
+            }
+        }, 5000);
+
+        // ✅ Limpiar estilo de error cuando el usuario empieza a escribir
+        document.querySelectorAll('.form-input, .form-select, .form-textarea').forEach(field => {
+            field.addEventListener('input', function() {
+                this.classList.remove('error');
+                this.style.borderColor = '#e0e0e0';
+            });
         });
     </script>
 </body>
