@@ -9,11 +9,12 @@ class User extends Authenticatable
 {
     use Notifiable;
 
-    // ✅ CRÍTICO: Especificar la tabla personalizada
     protected $table = 'usuarios';
+    protected $primaryKey = 'id_usuario';
 
     protected $fillable = [
         'nombre',
+        'Apellido',
         'correo',
         'contrasena',
         'id_rol',
@@ -29,17 +30,11 @@ class User extends Authenticatable
         'activo' => 'boolean',
     ];
 
-    /**
-     * Obtener la contraseña para autenticación
-     */
     public function getAuthPassword()
     {
         return $this->contrasena;
     }
 
-    /**
-     * Obtener el nombre del campo de contraseña
-     */
     public function getAuthPasswordName()
     {
         return 'contrasena';
