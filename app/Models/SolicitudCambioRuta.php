@@ -38,13 +38,14 @@ class SolicitudCambioRuta extends Model
         return $this->belongsTo(Conductor::class, 'id_conductor', 'id_conductor');
     }
 
-    public function tarifaActual()
-    {
-        return $this->belongsTo(TarifaDestino::class, 'id_tarifa_actual', 'id_tarifa');
+    public function tarifaDestino(){
+        return $this->belongsTo(TarifaDestino::class, 'id_tarifa_destino', 'id_tarifa_destino');
     }
-
-    public function tarifaSolicitada()
+     public function autorizadoPor()
     {
-        return $this->belongsTo(TarifaDestino::class, 'id_tarifa_solicitada', 'id_tarifa');
+        return $this->belongsTo(Usuario::class, 'autorizado_por', 'id_usuario');
+        // O si usas User en lugar de Usuario:
+        // return $this->belongsTo(User::class, 'autorizado_por', 'id');
     }
+    
 }
