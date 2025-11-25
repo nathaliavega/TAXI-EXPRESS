@@ -13,15 +13,13 @@ class ConductorController extends Controller
      * Mostrar el formulario de solicitudes de cambio de ruta
      * Ruta: GET /conductor/solicitudes-cambio-ruta
      */
-    public function nuevaSolicitudCambioRuta()  // ← CAMBIO AQUÍ
+    public function nuevaSolicitudCambioRuta()
     {
-        // Obtener todos los conductores
+        // Obtener todos los conductores (solo columnas que existen)
         $conductores = Conductor::select(
             'id_conductor',
             'primer_nombre',
-            'segundo_nombre',
             'primer_apellido',
-            'segundo_apellido',
             'tipo_documento',
             'numero_documento'
         )->get();
@@ -41,7 +39,7 @@ class ConductorController extends Controller
      * Guardar la solicitud de cambio de ruta
      * Ruta: POST /conductor/solicitudes-cambio-ruta
      */
-    public function storeSolicitudCambioRuta(Request $request)  // ← CAMBIO AQUÍ
+    public function storeSolicitudCambioRuta(Request $request)
     {
         // Validar los datos del formulario
         $validatedData = $request->validate([
@@ -56,7 +54,6 @@ class ConductorController extends Controller
             'numero_pasajeros' => 'nullable|integer|min:1',
             'tarifa_cobrada' => 'required|numeric|min:0',
         ], [
-            // Mensajes personalizados en español
             'id_conductor.required' => 'Debe seleccionar un conductor',
             'id_vehiculo.required' => 'Debe seleccionar un vehículo',
             'nombre_contratante.required' => 'El nombre del contratante es obligatorio',
