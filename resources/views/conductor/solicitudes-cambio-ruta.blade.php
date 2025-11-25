@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solicitudes de Cambio de Ruta - TAXI EXPRESS</title>
+    <title>Solicitudes de Servicio - TAXI EXPRESS</title>
     <style>
         * {
             margin: 0;
@@ -18,7 +18,6 @@
             padding: 0;
         }
 
-        /* Header con gradiente turquesa */
         .header {
             background: linear-gradient(135deg, #00bcd4 0%, #00acc1 100%);
             color: white;
@@ -42,7 +41,6 @@
             letter-spacing: 0.5px;
         }
 
-        /* Botón Volver */
         .btn-volver {
             display: inline-flex;
             align-items: center;
@@ -72,14 +70,12 @@
             height: 20px;
         }
 
-        /* Contenedor principal */
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 40px 40px;
         }
 
-        /* Card del formulario */
         .form-card {
             background: white;
             border-radius: 12px;
@@ -104,7 +100,6 @@
             opacity: 0.9;
         }
 
-        /* Contenido del formulario */
         .form-content {
             padding: 30px;
         }
@@ -136,7 +131,6 @@
             height: 24px;
         }
 
-        /* Grid de campos */
         .form-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -184,45 +178,6 @@
             min-height: 100px;
         }
 
-        /* Upload de archivos */
-        .file-upload-area {
-            border: 2px dashed #00bcd4;
-            border-radius: 8px;
-            padding: 30px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: #f5fffe;
-        }
-
-        .file-upload-area:hover {
-            background: #e0f7fa;
-            border-color: #00acc1;
-        }
-
-        .file-upload-icon {
-            width: 48px;
-            height: 48px;
-            color: #00bcd4;
-            margin: 0 auto 15px;
-        }
-
-        .file-input {
-            display: none;
-        }
-
-        .file-text {
-            color: #666;
-            font-size: 14px;
-        }
-
-        .file-hint {
-            color: #999;
-            font-size: 12px;
-            margin-top: 8px;
-        }
-
-        /* Botones de acción */
         .form-actions {
             display: flex;
             gap: 15px;
@@ -269,7 +224,6 @@
             height: 20px;
         }
 
-        /* Alertas */
         .alert {
             position: fixed;
             bottom: 20px;
@@ -305,7 +259,6 @@
             }
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
             .header {
                 padding: 20px 20px;
@@ -338,7 +291,6 @@
     </style>
 </head>
 <body>
-    <!-- Header -->
     <div class="header">
         <div class="header-content">
             <span class="header-icon">🔄</span>
@@ -346,7 +298,6 @@
         </div>
     </div>
 
-    <!-- Botón Volver -->
     <a href="{{ route('conductor.dashboard') }}" class="btn-volver">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
@@ -354,17 +305,14 @@
         Volver al Dashboard
     </a>
 
-    <!-- Contenedor Principal -->
     <div class="container">
         <div class="form-card">
-            <!-- Header del Formulario -->
             <div class="form-header">
-                <h2>Nueva Solicitud de Cambio</h2>
-                <p>Completa el formulario para solicitar un cambio de ruta</p>
+                <h2>Nueva Solicitud de Servicio</h2>
+                <p>Completa el formulario para solicitar un servicio de taxi</p>
             </div>
 
-            <!-- Contenido del Formulario -->
-            <form action="{{ route('conductor.solicitudes.store') }}" method="POST" enctype="multipart/form-data" class="form-content">
+            <form action="{{ route('conductor.solicitudes-cambio-ruta') }}" method="POST" class="form-content">
                 @csrf
 
                 <!-- Sección: Conductor y Vehículo -->
@@ -385,7 +333,7 @@
                                 <option value="">Seleccionar conductor...</option>
                                 @foreach($conductores as $conductor)
                                     <option value="{{ $conductor->id_conductor }}">
-                                        {{ $conductor->nombre }} {{ $conductor->apellido }} - CC {{ $conductor->cedula }}
+                                        {{ $conductor->primer_nombre }} {{ $conductor->primer_apellido }} - {{ $conductor->tipo_documento }} {{ $conductor->numero_documento }}
                                     </option>
                                 @endforeach
                             </select>
@@ -399,7 +347,7 @@
                                 <option value="">Seleccionar vehículo...</option>
                                 @foreach($vehiculos as $vehiculo)
                                     <option value="{{ $vehiculo->id_vehiculo }}">
-                                        {{ $vehiculo->placa }} - {{ $vehiculo->modelo }}
+                                        {{ $vehiculo->placa }} - {{ $vehiculo->marca ?? '' }} {{ $vehiculo->modelo ?? '' }}
                                     </option>
                                 @endforeach
                             </select>
@@ -407,96 +355,76 @@
                     </div>
                 </div>
 
-                <!-- Sección: Ruta Actual -->
+                <!-- Sección: Información del Contratante -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <svg class="section-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                        Datos del Contratante
+                    </h3>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Nombre Completo <span class="required">*</span></label>
+                            <input type="text" name="nombre_contratante" required placeholder="Nombre completo del cliente" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Documento <span class="required">*</span></label>
+                            <input type="text" name="documento_contratante" required placeholder="Número de documento" class="form-input">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Teléfono <span class="required">*</span></label>
+                        <input type="tel" name="telefono_contratante" required placeholder="Número de contacto" class="form-input">
+                    </div>
+                </div>
+
+                <!-- Sección: Direcciones -->
                 <div class="form-section">
                     <h3 class="section-title">
                         <svg class="section-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                         </svg>
-                        Ruta Actual
+                        Origen y Destino
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Dirección de Origen <span class="required">*</span></label>
+                        <textarea name="direccion_origen" required placeholder="Dirección completa de recogida" class="form-textarea" rows="2"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Dirección de Destino <span class="required">*</span></label>
+                        <textarea name="direccion_destino" required placeholder="Dirección completa de destino" class="form-textarea" rows="2"></textarea>
+                    </div>
+                </div>
+
+                <!-- Sección: Detalles del Servicio (OPCIONAL) -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <svg class="section-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Detalles del Servicio (Opcional)
                     </h3>
                     
                     <div class="form-grid">
                         <div class="form-group">
-                            <label class="form-label">Origen <span class="required">*</span></label>
-                            <input type="text" name="origen_actual" required placeholder="Ciudad de origen" class="form-input">
+                            <label class="form-label">Fecha y Hora Programada</label>
+                            <input type="datetime-local" name="fecha_viaje_programada" class="form-input">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Destino <span class="required">*</span></label>
-                            <input type="text" name="destino_actual" required placeholder="Ciudad de destino" class="form-input">
+                            <label class="form-label">Número de Pasajeros</label>
+                            <input type="number" name="numero_pasajeros" min="1" value="1" class="form-input">
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Código Ruta Actual <span class="required">*</span></label>
-                        <input type="text" name="codigo_ruta_actual" required placeholder="Ej: Ruta 45" class="form-input">
+                        <label class="form-label">Tarifa a Cobrar</label>
+                        <input type="number" name="tarifa_cobrada" step="0.01" placeholder="0.00" class="form-input">
                     </div>
-                </div>
-
-                <!-- Sección: Nueva Ruta Solicitada -->
-                <div class="form-section">
-                    <h3 class="section-title">
-                        <svg class="section-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
-                        </svg>
-                        Nueva Ruta Solicitada
-                    </h3>
-                    
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label class="form-label">Nuevo Origen <span class="required">*</span></label>
-                            <input type="text" name="nuevo_origen" required placeholder="Ciudad de origen" class="form-input">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Nuevo Destino <span class="required">*</span></label>
-                            <input type="text" name="nuevo_destino" required placeholder="Ciudad de destino" class="form-input">
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Código Nueva Ruta <span class="required">*</span></label>
-                        <input type="text" name="codigo_nueva_ruta" required placeholder="Ej: Ruta 23" class="form-input">
-                    </div>
-                </div>
-
-                <!-- Sección: Motivo y Fecha -->
-                <div class="form-section">
-                    <h3 class="section-title">
-                        <svg class="section-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                        </svg>
-                        Detalles de la Solicitud
-                    </h3>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Motivo de la Solicitud <span class="required">*</span></label>
-                        <textarea name="motivo" required placeholder="Explique detalladamente el motivo del cambio de ruta..." class="form-textarea"></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Fecha Efectiva del Cambio <span class="required">*</span></label>
-                        <input type="date" name="fecha_efectiva" required class="form-input">
-                    </div>
-                </div>
-
-                <!-- Sección: Documentos -->
-                <div class="form-section">
-                    <h3 class="section-title">
-                        <svg class="section-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-                        </svg>
-                        Documentos de Soporte (Opcional)
-                    </h3>
-                    
-                    <label for="fileInput" class="file-upload-area">
-                        <svg class="file-upload-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-                        </svg>
-                        <p class="file-text">Haz clic para seleccionar archivos</p>
-                        <p class="file-hint">PDF, JPG, PNG (Máx. 5MB por archivo)</p>
-                    </label>
-                    <input type="file" name="documentos[]" multiple accept=".pdf,.jpg,.jpeg,.png" class="file-input" id="fileInput">
                 </div>
 
                 <!-- Botones de Acción -->
@@ -537,18 +465,6 @@
     @endif
 
     <script>
-        // Mostrar nombre del archivo seleccionado
-        document.getElementById('fileInput').addEventListener('change', function(e) {
-            const fileCount = e.target.files.length;
-            if (fileCount > 0) {
-                const fileText = document.querySelector('.file-text');
-                fileText.textContent = `${fileCount} archivo(s) seleccionado(s)`;
-                fileText.style.color = '#00bcd4';
-                fileText.style.fontWeight = '600';
-            }
-        });
-
-        // Validación del formulario
         document.querySelector('form').addEventListener('submit', function(e) {
             const requiredFields = this.querySelectorAll('[required]');
             let isValid = true;
@@ -568,7 +484,6 @@
             }
         });
 
-        // Auto-ocultar alertas después de 5 segundos
         setTimeout(function() {
             const alerts = document.querySelectorAll('.alert');
             alerts.forEach(alert => {
