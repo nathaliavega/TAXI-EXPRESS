@@ -15,53 +15,42 @@ class ConductorController extends Controller
      */
     public function dashboard()
     {
-        // Obtener el usuario autenticado
+        // ✅ Obtener el usuario autenticado
         $usuario = auth()->user();
         
-        // ✅ Intentar obtener el conductor relacionado
-        $conductor = Conductor::where('id_usuario', $usuario->id_usuario)->first();
+        // ✅ Usar directamente los datos del usuario como conductor
+        $conductor = (object)[
+            'primer_nombre' => $usuario->nombre ?? 'Usuario',
+            'segundo_nombre' => '',
+            'primer_apellido' => $usuario->Apellido ?? '',
+            'segundo_apellido' => '',
+            'tipo_documento' => 'CC',
+            'numero_documento' => 'N/A',
+            'telefono' => 'N/A',
+            'celular' => 'N/A',
+            'email' => $usuario->correo ?? 'N/A',
+            'licencia' => 'N/A',
+            'categoria' => 'N/A',
+            'estado' => $usuario->activo ? 'Activo' : 'Inactivo',
+        ];
         
-        // Si no existe en conductores, crear un objeto con datos del usuario
-        if (!$conductor) {
-            $conductor = (object)[
-                'primer_nombre' => $usuario->nombre ?? 'Usuario',
-                'segundo_nombre' => '',
-                'primer_apellido' => $usuario->Apellido ?? '',
-                'segundo_apellido' => '',
-                'tipo_documento' => 'CC',
-                'numero_documento' => 'N/A',
-                'telefono' => 'N/A',
-                'celular' => 'N/A',
-                'email' => $usuario->correo ?? 'N/A',
-                'licencia' => 'N/A',
-                'categoria' => 'N/A',
-                'estado' => $usuario->activo ? 'Activo' : 'Inactivo',
-                'id_conductor' => $usuario->id_usuario, // Usar id_usuario como fallback
-            ];
-        }
-        
-        // Determinar qué ID usar para las consultas
-        $idConductor = isset($conductor->id_conductor) 
-            ? $conductor->id_conductor 
-            : $usuario->id_usuario;
-        
-        // Obtener estadísticas
+        // ✅ Usar el id_usuario para todas las consultas
         $estadisticas = [
-            'solicitudes_pendientes' => SolicitudCambioRuta::where('id_conductor', $idConductor)
+            'solicitudes_pendientes' => SolicitudCambioRuta::where('id_conductor', $usuario->id_usuario)
                 ->where('estado', 'pendiente')
                 ->count(),
-            'solicitudes_aprobadas' => SolicitudCambioRuta::where('id_conductor', $idConductor)
+            'solicitudes_aprobadas' => SolicitudCambioRuta::where('id_conductor', $usuario->id_usuario)
                 ->where('estado', 'aprobado')
                 ->count(),
-            'solicitudes_rechazadas' => SolicitudCambioRuta::where('id_conductor', $idConductor)
+            'solicitudes_rechazadas' => SolicitudCambioRuta::where('id_conductor', $usuario->id_usuario)
                 ->where('estado', 'rechazado')
                 ->count(),
-            'total_solicitudes' => SolicitudCambioRuta::where('id_conductor', $idConductor)
+            'total_solicitudes' => SolicitudCambioRuta::where('id_conductor', $usuario->id_usuario)
                 ->count(),
         ];
         
-        // Obtener últimas solicitudes
-        $ultimasSolicitudes = SolicitudCambioRuta::where('id_conductor', $idConductor)
+        // ✅ Obtener últimas solicitudes
+        $ultimasSolicitudes = SolicitudCambioRuta::where('id_conductor', $usuario->id_usuario)
             ->orderBy('fecha_solicitud', 'desc')
             ->limit(5)
             ->get();
@@ -86,7 +75,7 @@ class ConductorController extends Controller
     public function storeSolicitudCambioRuta(Request $request)
     {
         $validated = $request->validate([
-            'id_conductor' => 'required|exists:conductores,id_conductor',
+            'id_conductor' => 'required',
             'id_vehiculo' => 'required|exists:vehiculos,id_vehiculo',
             'nombre_contratante' => 'required|string|max:200',
             'documento_contratante' => 'required|string|max:50',
@@ -98,8 +87,11 @@ class ConductorController extends Controller
             'tarifa_cobrada' => 'required|numeric|min:0',
         ]);
 
+        // ✅ Usar el id_usuario del usuario autenticado
+        $usuario = auth()->user();
+        
         // Validación para evitar duplicados
-        $solicitudExistente = SolicitudCambioRuta::where('id_conductor', $validated['id_conductor'])
+        $solicitudExistente = SolicitudCambioRuta::where('id_conductor', $usuario->id_usuario)
             ->where('id_vehiculo', $validated['id_vehiculo'])
             ->where('estado', 'pendiente')
             ->first();
@@ -112,7 +104,7 @@ class ConductorController extends Controller
 
         try {
             SolicitudCambioRuta::create([
-                'id_conductor' => $validated['id_conductor'],
+                'id_conductor' => $usuario->id_usuario, // ✅ Usar el id_usuario
                 'id_vehiculo' => $validated['id_vehiculo'],
                 'id_tarifa_destino' => null,
                 'fecha_solicitud' => now(),
@@ -143,11 +135,9 @@ class ConductorController extends Controller
     public function misTurnos()
     {
         $usuario = auth()->user();
-        $conductor = Conductor::where('id_usuario', $usuario->id_usuario)->first();
-        $idConductor = $conductor ? $conductor->id_conductor : $usuario->id_usuario;
         
         // Si tienes modelo Turno
-        // $turnos = Turno::where('id_conductor', $idConductor)->get();
+        // $turnos = Turno::where('id_conductor', $usuario->id_usuario)->get();
         $turnos = [];
         
         return view('conductor.mis-turnos', compact('turnos'));
