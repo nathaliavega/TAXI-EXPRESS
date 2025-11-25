@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solicitudes de Servicio - TAXI EXPRESS</title>
+    <title>Solicitud cambio Ruta - TAXI EXPRESS</title>
     <style>
         * {
             margin: 0;
@@ -327,7 +327,7 @@
             </div>
 
             {{-- ✅ CAMBIO IMPORTANTE: Actualizar action para usar la ruta .store --}}
-            <form action="{{ route('conductor.solicitudes-cambio-ruta.store') }}" method="POST" class="form-content" id="solicitudForm">
+            <form action="{{ route('conductor.solicitudes-cambio-ruta') }}" method="POST" class="form-content" id="solicitudForm">
                 @csrf
                 
                 <!-- Sección: Conductor y Vehículo -->
@@ -348,7 +348,7 @@
                                 <option value="">Seleccionar conductor...</option>
                                 @foreach($conductores as $conductor)
                                     <option value="{{ $conductor->id_conductor }}" {{ old('id_conductor') == $conductor->id_conductor ? 'selected' : '' }}>
-                                        {{ $conductor->primer_nombre }} {{ $conductor->primer_apellido }} - {{ $conductor->tipo_documento }} {{ $conductor->numero_documento }}
+                                        {{ $conductor->primer_nombre }} {{ $conductor->primer_apellido }} 
                                     </option>
                                 @endforeach
                             </select>
@@ -362,7 +362,7 @@
                                 <option value="">Seleccionar vehículo...</option>
                                 @foreach($vehiculos as $vehiculo)
                                     <option value="{{ $vehiculo->id_vehiculo }}" {{ old('id_vehiculo') == $vehiculo->id_vehiculo ? 'selected' : '' }}>
-                                        {{ $vehiculo->placa }} - {{ $vehiculo->marca ?? '' }} {{ $vehiculo->modelo ?? '' }}
+                                        {{ $vehiculo->placa }}
                                     </option>
                                 @endforeach
                             </select>
