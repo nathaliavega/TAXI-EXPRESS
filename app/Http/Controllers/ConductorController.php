@@ -15,7 +15,7 @@ class ConductorController extends Controller
         return view('conductor.dashboard');
     }
 
-    // ✅ MÉTODO GET - Mostrar el formulario de nueva solicitud
+    // ✅ Mostrar el formulario de nueva solicitud
     public function solicitudesCambioRuta()
     {
         $conductores = Conductor::all();
@@ -24,27 +24,27 @@ class ConductorController extends Controller
         return view('conductor.solicitudes-cambio-ruta', compact('conductores', 'vehiculos'));
     }
     
-    // ✅ MÉTODO POST - Guardar la nueva solicitud
+    // ✅ Guardar la nueva solicitud
     public function storeSolicitudCambioRuta(Request $request)
     {
         // Validar los datos
         $validated = $request->validate([
             'id_conductor' => 'required|exists:conductores,id_conductor',
             'id_vehiculo' => 'required|exists:vehiculos,id_vehiculo',
-            'nombre_contratante' => 'required|string|max:255',
+            'nombre_contratante' => 'required|string|max:200',
             'documento_contratante' => 'required|string|max:50',
             'telefono_contratante' => 'required|string|max:20',
             'direccion_origen' => 'required|string',
             'direccion_destino' => 'required|string',
             'fecha_viaje_programada' => 'nullable|date',
             'numero_pasajeros' => 'nullable|integer|min:1',
-            'tarifa_cobrada' => 'nullable|numeric|min:0',
+            'tarifa_cobrada' => 'required|numeric|min:0',
         ]);
 
         // ✅ VALIDACIÓN PARA EVITAR DUPLICADOS
         $solicitudExistente = SolicitudCambioRuta::where('id_conductor', $validated['id_conductor'])
             ->where('id_vehiculo', $validated['id_vehiculo'])
-            ->whereIn('estado', ['pendiente', 'en_proceso'])
+            ->where('estado', 'pendiente')
             ->first();
 
         if ($solicitudExistente) {
@@ -58,15 +58,16 @@ class ConductorController extends Controller
             SolicitudCambioRuta::create([
                 'id_conductor' => $validated['id_conductor'],
                 'id_vehiculo' => $validated['id_vehiculo'],
+                'id_tarifa_destino' => null, // Se asignará después si es necesario
+                'fecha_solicitud' => now(),
+                'fecha_viaje_programada' => $validated['fecha_viaje_programada'],
                 'nombre_contratante' => $validated['nombre_contratante'],
                 'documento_contratante' => $validated['documento_contratante'],
                 'telefono_contratante' => $validated['telefono_contratante'],
                 'direccion_origen' => $validated['direccion_origen'],
                 'direccion_destino' => $validated['direccion_destino'],
-                'fecha_viaje_programada' => $validated['fecha_viaje_programada'],
                 'numero_pasajeros' => $validated['numero_pasajeros'] ?? 1,
                 'tarifa_cobrada' => $validated['tarifa_cobrada'],
-                'fecha_solicitud' => now(),
                 'estado' => 'pendiente',
             ]);
 
@@ -80,20 +81,29 @@ class ConductorController extends Controller
         }
     }
 
-    // Otros métodos del conductor...
+    // ✅ Mis Turnos - CORREGIDO
     public function misTurnos()
     {
-        return view('conductor.mis-turnos');
+        $conductorId = auth()->user()->id_usuario;
+        
+        // Obtener los turnos (ajusta según tu modelo)
+        $turnos = []; // Cambia esto por tu lógica real
+        // Ejemplo: $turnos = Turno::where('id_conductor', $conductorId)->get();
+        
+        return view('conductor.mis-turnos', compact('turnos'));
     }
 
+    // Otros métodos
     public function alertas()
     {
-        return view('conductor.alertas');
+        $alertas = []; // Ajusta según tu lógica
+        return view('conductor.alertas', compact('alertas'));
     }
 
     public function conductores()
     {
-        return view('conductor.conductores');
+        $conductores = Conductor::all();
+        return view('conductor.conductores', compact('conductores'));
     }
 
     public function mantenimientoGeneral()
@@ -103,11 +113,13 @@ class ConductorController extends Controller
 
     public function tarifas()
     {
-        return view('conductor.tarifas');
+        $tarifas = []; // Ajusta según tu lógica
+        return view('conductor.tarifas', compact('tarifas'));
     }
 
     public function vehiculos()
     {
-        return view('conductor.vehiculos');
+        $vehiculos = Vehiculo::all();
+        return view('conductor.vehiculos', compact('vehiculos'));
     }
 }

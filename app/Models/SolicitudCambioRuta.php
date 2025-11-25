@@ -10,7 +10,7 @@ class SolicitudCambioRuta extends Model
     protected $primaryKey = 'id_solicitud';
     
     public $timestamps = false; // Tu tabla no tiene created_at/updated_at
-
+    
     protected $fillable = [
         'id_conductor',
         'id_vehiculo',
@@ -28,6 +28,7 @@ class SolicitudCambioRuta extends Model
         'fecha_inicio_real',
         'fecha_fin_real',
         'tarifa_cobrada',
+        'estado',
     ];
 
     protected $casts = [
@@ -37,6 +38,7 @@ class SolicitudCambioRuta extends Model
         'fecha_inicio_real' => 'datetime',
         'fecha_fin_real' => 'datetime',
         'tarifa_cobrada' => 'decimal:2',
+        'numero_pasajeros' => 'integer',
     ];
 
     // Relaciones
@@ -57,6 +59,6 @@ class SolicitudCambioRuta extends Model
 
     public function autorizadoPor()
     {
-        return $this->belongsTo(User::class, 'autorizado_por', 'id_usuario');
+        return $this->belongsTo(Usuario::class, 'autorizado_por', 'id_usuario');
     }
 }
