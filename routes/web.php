@@ -91,7 +91,14 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/alertas', [ConductorController::class, 'alertas'])->name('alertas');
         Route::get('/conductores', [ConductorController::class, 'conductores'])->name('conductores');
         Route::get('/mantenimiento-general', [ConductorController::class, 'mantenimientoGeneral'])->name('mantenimiento-general');
-        Route::get('/solicitudes-cambio-ruta', [ConductorController::class, 'solicitudesCambioRuta'])->name('solicitudes-cambio-ruta');
+        
+        // ✅ RUTAS ACTUALIZADAS PARA SOLICITUDES DE CAMBIO DE RUTA
+        // Ruta GET para mostrar el formulario de nueva solicitud
+        Route::get('/solicitudes-cambio-ruta', [ConductorController::class, 'nuevaSolicitudCambioRuta'])->name('solicitudes-cambio-ruta');
+        
+        // Ruta POST para guardar la nueva solicitud
+        Route::post('/solicitudes-cambio-ruta', [ConductorController::class, 'storeSolicitudCambioRuta'])->name('solicitudes.store');
+        
         Route::get('/tarifas', [ConductorController::class, 'tarifas'])->name('tarifas');
         Route::get('/vehiculos', [ConductorController::class, 'vehiculos'])->name('vehiculos');
     });

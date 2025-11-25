@@ -10,6 +10,7 @@ use App\Models\MantenimientoGeneral;
 use App\Models\SolicitudCambioRuta;
 use App\Models\Propietario;
 use App\Models\TarifaDestino;
+use App\Models\Vehiculo; // ✅ AGREGAR ESTE IMPORT
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
@@ -127,7 +128,8 @@ class ConductorController extends Controller
         return view('conductor.mantenimiento-general', compact('mantenimientos'));
     }
 
-   
+    // ✅ MÉTODO EXISTENTE - MUESTRA LA LISTA DE SOLICITUDES
+    // Puedes renombrarlo a listarSolicitudes() si quieres
     public function solicitudesCambioRuta()
     {
         $conductor = $this->getConductorAutenticado();
@@ -147,7 +149,70 @@ class ConductorController extends Controller
         ->orderBy('fecha_solicitud', 'desc')
         ->paginate(20);
 
-        return view('conductor.solicitudes-cambio-ruta', compact('solicitudes'));
+        return view('conductor.solicitudes-cambio-ruta-lista', compact('solicitudes')); // ✅ Cambié el nombre de la vista
+    }
+
+    // ✅ NUEVO MÉTODO - MUESTRA EL FORMULARIO PARA NUEVA SOLICITUD
+    public function nuevaSolicitudCambioRuta()
+    {
+        $conductores = Conductor::where('activo', true)->orderBy('nombre')->get();
+        $vehiculos = Vehiculo::where('activo', true)->orderBy('placa')->get();
+        
+        return view('conductor.solicitudes-cambio-ruta', compact('conductores', 'vehiculos'));
+    }
+
+    // ✅ NUEVO MÉTODO - GUARDA LA SOLICITUD
+    public function storeSolicitudCambioRuta(Request $request)
+    {
+        $validated = $request->validate([
+            'id_conductor' => 'required|exists:conductores,id_conductor',
+            'id_vehiculo' => 'required|exists:vehiculos,id_vehiculo',
+            'origen_actual' => 'required|string|max:255',
+            'destino_actual' => 'required|string|max:255',
+            'codigo_ruta_actual' => 'required|string|max:50',
+            'nuevo_origen' => 'required|string|max:255',
+            'nuevo_destino' => 'required|string|max:255',
+            'codigo_nueva_ruta' => 'required|string|max:50',
+            'motivo' => 'required|string',
+            'fecha_efectiva' => 'required|date',
+            'documentos.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120'
+        ]);
+
+        try {
+            // Guardar la solicitud
+            $solicitud = SolicitudCambioRuta::create([
+                'id_conductor' => $validated['id_conductor'],
+                'id_vehiculo' => $validated['id_vehiculo'],
+                'origen_actual' => $validated['origen_actual'],
+                'destino_actual' => $validated['destino_actual'],
+                'codigo_ruta_actual' => $validated['codigo_ruta_actual'],
+                'nuevo_origen' => $validated['nuevo_origen'],
+                'nuevo_destino' => $validated['nuevo_destino'],
+                'codigo_nueva_ruta' => $validated['codigo_nueva_ruta'],
+                'motivo' => $validated['motivo'],
+                'fecha_efectiva' => $validated['fecha_efectiva'],
+                'fecha_solicitud' => now(),
+                'estado' => 'Pendiente',
+            ]);
+
+            // Manejar archivos adjuntos si existen
+            if ($request->hasFile('documentos')) {
+                foreach ($request->file('documentos') as $documento) {
+                    $nombreArchivo = time() . '_' . uniqid() . '.' . $documento->getClientOriginalExtension();
+                    $ruta = $documento->storeAs('solicitudes/documentos', $nombreArchivo, 'public');
+                    
+                    // Si tienes una tabla de documentos, guárdala aquí
+                    // DocumentoSolicitud::create(['id_solicitud' => $solicitud->id, 'ruta' => $ruta]);
+                }
+            }
+
+            return redirect()->route('conductor.solicitudes')->with('success', '✅ Solicitud enviada correctamente');
+            
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Error al guardar la solicitud: ' . $e->getMessage());
+        }
     }
 
     public function propietarios()

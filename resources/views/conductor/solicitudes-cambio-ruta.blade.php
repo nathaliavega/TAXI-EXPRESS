@@ -1,522 +1,581 @@
-@extends('layouts.app')
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitudes de Cambio de Ruta - TAXI EXPRESS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-@section('title', 'Solicitudes de Cambio de Ruta')
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+            min-height: 100vh;
+            padding: 0;
+        }
 
-@section('content')
-<div class="container-fluid">
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('conductor.dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item active">Solicitudes de Cambio de Ruta</li>
-        </ol>
-    </nav>
+        /* Header con gradiente turquesa */
+        .header {
+            background: linear-gradient(135deg, #00bcd4 0%, #00acc1 100%);
+            color: white;
+            padding: 25px 40px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
 
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-icon {
+            font-size: 32px;
+        }
+
+        .header-title {
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* Botón Volver */
+        .btn-volver {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #00bcd4;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin: 20px 40px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-volver:hover {
+            background: #0097a7;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-volver svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Contenedor principal */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 40px 40px;
+        }
+
+        /* Card del formulario */
+        .form-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .form-header {
+            background: linear-gradient(135deg, #00bcd4 0%, #00acc1 100%);
+            color: white;
+            padding: 25px 30px;
+        }
+
+        .form-header h2 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .form-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* Contenido del formulario */
+        .form-content {
+            padding: 30px;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #00bcd4;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-icon {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* Grid de campos */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .required {
+            color: #f44336;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #00bcd4;
+            box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Upload de archivos */
+        .file-upload-area {
+            border: 2px dashed #00bcd4;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f5fffe;
+        }
+
+        .file-upload-area:hover {
+            background: #e0f7fa;
+            border-color: #00acc1;
+        }
+
+        .file-upload-icon {
+            width: 48px;
+            height: 48px;
+            color: #00bcd4;
+            margin: 0 auto 15px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-text {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .file-hint {
+            color: #999;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+
+        /* Botones de acción */
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-cancelar {
+            background: #e0e0e0;
+            color: #666;
+        }
+
+        .btn-cancelar:hover {
+            background: #d0d0d0;
+        }
+
+        .btn-enviar {
+            background: linear-gradient(135deg, #00bcd4 0%, #00acc1 100%);
+            color: white;
+            box-shadow: 0 4px 8px rgba(0, 188, 212, 0.3);
+        }
+
+        .btn-enviar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 188, 212, 0.4);
+        }
+
+        .btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Alertas */
+        .alert {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            animation: slideIn 0.3s ease;
+            z-index: 1000;
+        }
+
+        .alert-success {
+            background: #4caf50;
+        }
+
+        .alert-error {
+            background: #f44336;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                padding: 20px 20px;
+            }
+
+            .header-title {
+                font-size: 22px;
+            }
+
+            .container {
+                padding: 0 20px 20px;
+            }
+
+            .form-content {
+                padding: 20px;
+            }
+
+            .btn-volver {
+                margin: 15px 20px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
     <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2><i class="fas fa-route me-2"></i>Solicitudes de Cambio de Ruta</h2>
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalNuevaSolicitud">
-            <i class="fas fa-plus me-2"></i>Nueva Solicitud
-        </button>
-    </div>
-
-    <!-- Tarjetas de Estadísticas -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card border-start border-primary border-4">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-muted mb-1">Total Solicitudes</h6>
-                            <h3 class="mb-0">67</h3>
-                        </div>
-                        <div class="fs-1 text-primary">
-                            <i class="fas fa-clipboard-list"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card border-start border-warning border-4">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-muted mb-1">Pendientes</h6>
-                            <h3 class="mb-0">18</h3>
-                        </div>
-                        <div class="fs-1 text-warning">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card border-start border-success border-4">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-muted mb-1">Aprobadas</h6>
-                            <h3 class="mb-0">42</h3>
-                        </div>
-                        <div class="fs-1 text-success">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card border-start border-danger border-4">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-muted mb-1">Rechazadas</h6>
-                            <h3 class="mb-0">7</h3>
-                        </div>
-                        <div class="fs-1 text-danger">
-                            <i class="fas fa-times-circle"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div class="header">
+        <div class="header-content">
+            <span class="header-icon">🔄</span>
+            <h1 class="header-title">Solicitudes de Cambio de Ruta</h1>
         </div>
     </div>
 
-    <!-- Filtros -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <div class="row g-3">
-                <div class="col-md-3">
-                    <label class="form-label">Estado</label>
-                    <select class="form-select">
-                        <option value="">Todos</option>
-                        <option value="pendiente">Pendiente</option>
-                        <option value="revision">En Revisión</option>
-                        <option value="aprobada">Aprobada</option>
-                        <option value="rechazada">Rechazada</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Conductor</label>
-                    <select class="form-select">
-                        <option value="">Todos</option>
-                        <option value="1">Juan Pérez</option>
-                        <option value="2">María López</option>
-                        <option value="3">Carlos Martínez</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Fecha Desde</label>
-                    <input type="date" class="form-control">
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Fecha Hasta</label>
-                    <input type="date" class="form-control">
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Buscar</label>
-                    <input type="text" class="form-control" placeholder="Buscar...">
-                </div>
+    <!-- Botón Volver -->
+    <a href="{{ route('conductor.dashboard') }}" class="btn-volver">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+        Volver al Dashboard
+    </a>
+
+    <!-- Contenedor Principal -->
+    <div class="container">
+        <div class="form-card">
+            <!-- Header del Formulario -->
+            <div class="form-header">
+                <h2>Nueva Solicitud de Cambio</h2>
+                <p>Completa el formulario para solicitar un cambio de ruta</p>
             </div>
-        </div>
-    </div>
 
-    <!-- Tabs -->
-    <ul class="nav nav-tabs mb-3" id="solicitudesTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="todas-tab" data-bs-toggle="tab" data-bs-target="#todas" type="button">
-                Todas <span class="badge bg-primary ms-2">67</span>
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="pendientes-tab" data-bs-toggle="tab" data-bs-target="#pendientes" type="button">
-                Pendientes <span class="badge bg-warning ms-2">18</span>
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="aprobadas-tab" data-bs-toggle="tab" data-bs-target="#aprobadas" type="button">
-                Aprobadas <span class="badge bg-success ms-2">42</span>
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="rechazadas-tab" data-bs-toggle="tab" data-bs-target="#rechazadas" type="button">
-                Rechazadas <span class="badge bg-danger ms-2">7</span>
-            </button>
-        </li>
-    </ul>
+            <!-- Contenido del Formulario -->
+            <form action="{{ route('conductor.solicitudes.store') }}" method="POST" enctype="multipart/form-data" class="form-content">
+                @csrf
 
-    <!-- Contenido de Tabs -->
-    <div class="tab-content" id="solicitudesTabsContent">
-        <div class="tab-pane fade show active" id="todas" role="tabpanel">
-            <div class="card">
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Fecha Solicitud</th>
-                                    <th>Conductor</th>
-                                    <th>Vehículo</th>
-                                    <th>Ruta Actual</th>
-                                    <th>Ruta Nueva</th>
-                                    <th>Motivo</th>
-                                    <th>Estado</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>21/11/2024<br><small class="text-muted">10:30 AM</small></td>
-                                    <td>
-                                        <strong>Juan Pérez</strong><br>
-                                        <small class="text-muted">CC 1234567890</small>
-                                    </td>
-                                    <td>ABC-123</td>
-                                    <td>
-                                        <strong>Bucaramanga → Cúcuta</strong><br>
-                                        <small class="text-muted">Ruta 45</small>
-                                    </td>
-                                    <td>
-                                        <strong>Bucaramanga → Medellín</strong><br>
-                                        <small class="text-muted">Ruta 23</small>
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="tooltip" title="Motivo personal - cercanía familiar">
-                                            <i class="fas fa-info-circle"></i>
-                                        </button>
-                                    </td>
-                                    <td><span class="badge bg-warning">Pendiente</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#modalVerSolicitud">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#modalAprobarSolicitud">
-                                            <i class="fas fa-check"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#modalRechazarSolicitud">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>20/11/2024<br><small class="text-muted">02:15 PM</small></td>
-                                    <td>
-                                        <strong>María López</strong><br>
-                                        <small class="text-muted">CC 9876543210</small>
-                                    </td>
-                                    <td>XYZ-789</td>
-                                    <td>
-                                        <strong>Bogotá → Cali</strong><br>
-                                        <small class="text-muted">Ruta 12</small>
-                                    </td>
-                                    <td>
-                                        <strong>Bogotá → Cartagena</strong><br>
-                                        <small class="text-muted">Ruta 67</small>
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="tooltip" title="Mejor conocimiento de la ruta">
-                                            <i class="fas fa-info-circle"></i>
-                                        </button>
-                                    </td>
-                                    <td><span class="badge bg-success">Aprobada</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#modalVerSolicitud">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-secondary">
-                                            <i class="fas fa-file-pdf"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>19/11/2024<br><small class="text-muted">09:45 AM</small></td>
-                                    <td>
-                                        <strong>Carlos Martínez</strong><br>
-                                        <small class="text-muted">CC 5551234567</small>
-                                    </td>
-                                    <td>DEF-456</td>
-                                    <td>
-                                        <strong>Medellín → Barranquilla</strong><br>
-                                        <small class="text-muted">Ruta 89</small>
-                                    </td>
-                                    <td>
-                                        <strong>Medellín → Santa Marta</strong><br>
-                                        <small class="text-muted">Ruta 34</small>
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="tooltip" title="Problemas de salud">
-                                            <i class="fas fa-info-circle"></i>
-                                        </button>
-                                    </td>
-                                    <td><span class="badge bg-primary">En Revisión</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#modalVerSolicitud">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#modalAprobarSolicitud">
-                                            <i class="fas fa-check"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#modalRechazarSolicitud">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Paginación -->
-                    <nav>
-                        <ul class="pagination justify-content-center mb-0">
-                            <li class="page-item disabled">
-                                <a class="page-link" href="#" tabindex="-1">Anterior</a>
-                            </li>
-                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">Siguiente</a>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Nueva Solicitud -->
-<div class="modal fade" id="modalNuevaSolicitud" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Nueva Solicitud de Cambio de Ruta</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Conductor</label>
-                            <select class="form-select" required>
+                <!-- Sección: Conductor y Vehículo -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <svg class="section-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                        Información del Conductor y Vehículo
+                    </h3>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">
+                                Conductor <span class="required">*</span>
+                            </label>
+                            <select name="id_conductor" required class="form-select">
                                 <option value="">Seleccionar conductor...</option>
-                                <option value="1">Juan Pérez - CC 1234567890</option>
-                                <option value="2">María López - CC 9876543210</option>
-                                <option value="3">Carlos Martínez - CC 5551234567</option>
+                                @foreach($conductores as $conductor)
+                                    <option value="{{ $conductor->id_conductor }}">
+                                        {{ $conductor->nombre }} {{ $conductor->apellido }} - CC {{ $conductor->cedula }}
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Vehículo</label>
-                            <select class="form-select" required>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                Vehículo <span class="required">*</span>
+                            </label>
+                            <select name="id_vehiculo" required class="form-select">
                                 <option value="">Seleccionar vehículo...</option>
-                                <option value="1">ABC-123 - Chevrolet NPR</option>
-                                <option value="2">XYZ-789 - Ford Cargo</option>
-                                <option value="3">DEF-456 - Isuzu NQR</option>
+                                @foreach($vehiculos as $vehiculo)
+                                    <option value="{{ $vehiculo->id_vehiculo }}">
+                                        {{ $vehiculo->placa }} - {{ $vehiculo->modelo }}
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
                     </div>
-                    <hr>
-                    <h6>Ruta Actual</h6>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Origen</label>
-                            <input type="text" class="form-control" placeholder="Ciudad de origen" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Destino</label>
-                            <input type="text" class="form-control" placeholder="Ciudad de destino" required>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Código Ruta Actual</label>
-                        <input type="text" class="form-control" placeholder="Ej: Ruta 45" required>
-                    </div>
-                    <hr>
-                    <h6>Nueva Ruta Solicitada</h6>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Nuevo Origen</label>
-                            <input type="text" class="form-control" placeholder="Ciudad de origen" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Nuevo Destino</label>
-                            <input type="text" class="form-control" placeholder="Ciudad de destino" required>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Código Nueva Ruta</label>
-                        <input type="text" class="form-control" placeholder="Ej: Ruta 23">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Motivo de la Solicitud</label>
-                        <textarea class="form-control" rows="4" placeholder="Explique detalladamente el motivo del cambio de ruta..." required></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Fecha Efectiva del Cambio</label>
-                        <input type="date" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Documentos de Soporte (Opcional)</label>
-                        <input type="file" class="form-control" accept=".pdf,.jpg,.png" multiple>
-                        <small class="text-muted">Puede adjuntar certificados médicos, cartas, etc.</small>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary">Enviar Solicitud</button>
-            </div>
-        </div>
-    </div>
-</div>
+                </div>
 
-<!-- Modal Ver Solicitud -->
-<div class="modal fade" id="modalVerSolicitud" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Detalles de la Solicitud</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="alert alert-warning">
-                    <strong>Estado:</strong> <span class="badge bg-warning ms-2">Pendiente de Aprobación</span>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <strong>Fecha de Solicitud:</strong>
-                        <p>21/11/2024 10:30 AM</p>
+                <!-- Sección: Ruta Actual -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <svg class="section-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        Ruta Actual
+                    </h3>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Origen <span class="required">*</span></label>
+                            <input type="text" name="origen_actual" required placeholder="Ciudad de origen" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Destino <span class="required">*</span></label>
+                            <input type="text" name="destino_actual" required placeholder="Ciudad de destino" class="form-input">
+                        </div>
                     </div>
-                    <div class="col-md-6">
-                        <strong>Conductor:</strong>
-                        <p>Juan Pérez González - CC 1234567890</p>
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <strong>Vehículo:</strong>
-                        <p>ABC-123 - Chevrolet NPR 2020</p>
-                    </div>
-                    <div class="col-md-6">
-                        <strong>Fecha Efectiva:</strong>
-                        <p>25/11/2024</p>
-                    </div>
-                </div>
-                <hr>
-                <h6>Ruta Actual</h6>
-                <div class="row mb-3">
-                    <div class="col-md-4">
-                        <strong>Origen:</strong>
-                        <p>Bucaramanga</p>
-                    </div>
-                    <div class="col-md-4">
-                        <strong>Destino:</strong>
-                        <p>Cúcuta</p>
-                    </div>
-                    <div class="col-md-4">
-                        <strong>Código:</strong>
-                        <p>Ruta 45</p>
-                    </div>
-                </div>
-                <hr>
-                <h6>Nueva Ruta Solicitada</h6>
-                <div class="row mb-3">
-                    <div class="col-md-4">
-                        <strong>Origen:</strong>
-                        <p>Bucaramanga</p>
-                    </div>
-                    <div class="col-md-4">
-                        <strong>Destino:</strong>
-                        <p>Medellín</p>
-                    </div>
-                    <div class="col-md-4">
-                        <strong>Código:</strong>
-                        <p>Ruta 23</p>
-                    </div>
-                </div>
-                <hr>
-                <div class="mb-3">
-                    <strong>Motivo de la Solicitud:</strong>
-                    <p>Por motivos personales, requiero cambiar mi ruta habitual. Tengo familia en Medellín que necesita mi apoyo y este cambio me permitiría estar más cerca de ellos. Conozco bien la ruta Bucaramanga-Medellín y cuento con la experiencia necesaria para operarla de manera segura y eficiente.</p>
-                </div>
-                <div class="mb-3">
-                    <strong>Documentos Adjuntos:</strong>
-                    <div class="mt-2">
-                        <a href="#" class="btn btn-sm btn-outline-secondary me-2">
-                            <i class="fas fa-file-pdf me-1"></i>Carta_Justificacion.pdf
-                        </a>
-                    </div>
-                </div>
-                <hr>
-                <div class="row">
-                    <div class="col-md-6">
-                        <strong>Solicitado por:</strong>
-                        <p>Juan Pérez González</p>
-                    </div>
-                    <div class="col-md-6">
-                        <strong>Revisado por:</strong>
-                        <p><span class="text-muted">Pendiente</span></p>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalAprobarSolicitud">
-                    <i class="fas fa-check me-2"></i>Aprobar
-                </button>
-                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalRechazarSolicitud">
-                    <i class="fas fa-times me-2"></i>Rechazar
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Modal Aprobar Solicitud -->
-<div class="modal fade" id="modalAprobarSolicitud" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-success text-white">
-                <h5 class="modal-title">Aprobar Solicitud</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p>¿Está seguro de aprobar esta solicitud de cambio de ruta?</p>
-                <div class="mb-3">
-                    <label class="form-label">Observaciones (Opcional)</label>
-                    <textarea class="form-control" rows="3" placeholder="Agregue observaciones sobre la aprobación..."></textarea>
+                    <div class="form-group">
+                        <label class="form-label">Código Ruta Actual <span class="required">*</span></label>
+                        <input type="text" name="codigo_ruta_actual" required placeholder="Ej: Ruta 45" class="form-input">
+                    </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-success">Confirmar Aprobación</button>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Modal Rechazar Solicitud -->
-<div class="modal fade" id="modalRechazarSolicitud" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title">Rechazar Solicitud</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p>¿Está seguro de rechazar esta solicitud de cambio de ruta?</p>
-                <div class="mb-3">
-                    <label class="form-label">Motivo del Rechazo <span class="text-danger">*</span></label>
-                    <textarea class="form-control" rows="3" placeholder="Explique el motivo del rechazo..." required></textarea>
+                <!-- Sección: Nueva Ruta Solicitada -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <svg class="section-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+                        </svg>
+                        Nueva Ruta Solicitada
+                    </h3>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Nuevo Origen <span class="required">*</span></label>
+                            <input type="text" name="nuevo_origen" required placeholder="Ciudad de origen" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Nuevo Destino <span class="required">*</span></label>
+                            <input type="text" name="nuevo_destino" required placeholder="Ciudad de destino" class="form-input">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Código Nueva Ruta <span class="required">*</span></label>
+                        <input type="text" name="codigo_nueva_ruta" required placeholder="Ej: Ruta 23" class="form-input">
+                    </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-danger">Confirmar Rechazo</button>
-            </div>
+
+                <!-- Sección: Motivo y Fecha -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <svg class="section-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        Detalles de la Solicitud
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Motivo de la Solicitud <span class="required">*</span></label>
+                        <textarea name="motivo" required placeholder="Explique detalladamente el motivo del cambio de ruta..." class="form-textarea"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Fecha Efectiva del Cambio <span class="required">*</span></label>
+                        <input type="date" name="fecha_efectiva" required class="form-input">
+                    </div>
+                </div>
+
+                <!-- Sección: Documentos -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <svg class="section-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                        </svg>
+                        Documentos de Soporte (Opcional)
+                    </h3>
+                    
+                    <label for="fileInput" class="file-upload-area">
+                        <svg class="file-upload-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                        </svg>
+                        <p class="file-text">Haz clic para seleccionar archivos</p>
+                        <p class="file-hint">PDF, JPG, PNG (Máx. 5MB por archivo)</p>
+                    </label>
+                    <input type="file" name="documentos[]" multiple accept=".pdf,.jpg,.jpeg,.png" class="file-input" id="fileInput">
+                </div>
+
+                <!-- Botones de Acción -->
+                <div class="form-actions">
+                    <button type="button" onclick="window.location.href='{{ route('conductor.dashboard') }}'" class="btn btn-cancelar">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-enviar">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                        </svg>
+                        Enviar Solicitud
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
-</div>
-@endsection
+
+    @if(session('success'))
+    <div class="alert alert-success">
+        <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+        {{ session('success') }}
+    </div>
+    @endif
+
+    @if($errors->any())
+    <div class="alert alert-error">
+        <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+        {{ $errors->first() }}
+    </div>
+    @endif
+
+    <script>
+        // Mostrar nombre del archivo seleccionado
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const fileCount = e.target.files.length;
+            if (fileCount > 0) {
+                const fileText = document.querySelector('.file-text');
+                fileText.textContent = `${fileCount} archivo(s) seleccionado(s)`;
+                fileText.style.color = '#00bcd4';
+                fileText.style.fontWeight = '600';
+            }
+        });
+
+        // Validación del formulario
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const requiredFields = this.querySelectorAll('[required]');
+            let isValid = true;
+
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    isValid = false;
+                    field.style.borderColor = '#f44336';
+                } else {
+                    field.style.borderColor = '#e0e0e0';
+                }
+            });
+
+            if (!isValid) {
+                e.preventDefault();
+                alert('Por favor complete todos los campos obligatorios');
+            }
+        });
+
+        // Auto-ocultar alertas después de 5 segundos
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            });
+        }, 5000);
+    </script>
+</body>
+</html>
