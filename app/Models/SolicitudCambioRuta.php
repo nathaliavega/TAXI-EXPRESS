@@ -39,7 +39,7 @@ class SolicitudCambioRuta extends Model
     }
 
     public function tarifaDestino(){
-        return $this->belongsTo(TarifaDestino::class, 'id_tarifa_destino', 'id_tarifa_destino');
+        return $this->belongsTo(TarifaDestino::class, 'id_tarifa_destino', 'id_tarifa');
     }
      public function autorizadoPor()
     {
