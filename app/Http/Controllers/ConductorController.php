@@ -10,7 +10,7 @@ use App\Models\MantenimientoGeneral;
 use App\Models\SolicitudCambioRuta;
 use App\Models\Propietario;
 use App\Models\TarifaDestino;
-use App\Models\Vehiculo; // ✅ AGREGAR ESTE IMPORT
+use App\Models\Vehiculo;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
@@ -25,7 +25,7 @@ class ConductorController extends Controller
             return null;
         }
         
-       
+        // Busca por email (columna en tabla conductores)
         return Conductor::where('email', $user->correo)->first();
     }
 
@@ -121,47 +121,29 @@ class ConductorController extends Controller
 
     public function mantenimientoGeneral()
     {
-        $mantenimientos = MantenimientoGeneral::where('activo', true)
-            ->orderBy('nombre', 'asc')
+        // Sin filtro de 'activo' - ajusta según tu tabla
+        $mantenimientos = MantenimientoGeneral::orderBy('nombre', 'asc')
             ->paginate(20);
 
         return view('conductor.mantenimiento-general', compact('mantenimientos'));
     }
 
-    // ✅ MÉTODO EXISTENTE - MUESTRA LA LISTA DE SOLICITUDES
-    // Puedes renombrarlo a listarSolicitudes() si quieres
-    public function solicitudesCambioRuta()
-    {
-        $conductor = $this->getConductorAutenticado();
-
-        if (!$conductor) {
-            return redirect()->route('conductor.dashboard')
-                ->with('error', 'No se encontró información del conductor');
-        }
-
-        $solicitudes = SolicitudCambioRuta::with([
-            'conductor',
-            'vehiculo',
-            'tarifaDestino',
-            'autorizadoPor'
-        ])
-        ->where('id_conductor', $conductor->id_conductor)
-        ->orderBy('fecha_solicitud', 'desc')
-        ->paginate(20);
-
-        return view('conductor.solicitudes-cambio-ruta-lista', compact('solicitudes')); // ✅ Cambié el nombre de la vista
-    }
-
-    // ✅ NUEVO MÉTODO - MUESTRA EL FORMULARIO PARA NUEVA SOLICITUD
+    // ✅ MÉTODO PARA MOSTRAR EL FORMULARIO DE NUEVA SOLICITUD
     public function nuevaSolicitudCambioRuta()
     {
-        $conductores = Conductor::where('activo', true)->orderBy('nombre')->get();
-        $vehiculos = Vehiculo::where('activo', true)->orderBy('placa')->get();
+        // Filtramos conductores activos usando la columna 'estado'
+        $conductores = Conductor::where('estado', 'activo')
+            ->orderBy('primer_nombre')
+            ->orderBy('primer_apellido')
+            ->get();
+        
+        // Filtramos vehículos activos - ajusta según tu estructura de tabla vehiculos
+        $vehiculos = Vehiculo::orderBy('placa')->get();
         
         return view('conductor.solicitudes-cambio-ruta', compact('conductores', 'vehiculos'));
     }
 
-    // ✅ NUEVO MÉTODO - GUARDA LA SOLICITUD
+    // ✅ MÉTODO PARA GUARDAR LA SOLICITUD
     public function storeSolicitudCambioRuta(Request $request)
     {
         $validated = $request->validate([
@@ -206,7 +188,8 @@ class ConductorController extends Controller
                 }
             }
 
-            return redirect()->route('conductor.solicitudes')->with('success', '✅ Solicitud enviada correctamente');
+            return redirect()->route('conductor.dashboard')
+                ->with('success', '✅ Solicitud enviada correctamente');
             
         } catch (\Exception $e) {
             return redirect()->back()
@@ -217,8 +200,8 @@ class ConductorController extends Controller
 
     public function propietarios()
     {
-        $propietarios = Propietario::where('activo', true)
-            ->withCount('vehiculos')
+        // Sin filtro de 'activo' - ajusta según tu tabla propietarios
+        $propietarios = Propietario::withCount('vehiculos')
             ->orderBy('razon_social', 'asc')
             ->paginate(20);
 
@@ -228,8 +211,8 @@ class ConductorController extends Controller
   
     public function tarifas()
     {
-        $tarifas = TarifaDestino::where('activa', true)
-            ->orderBy('nombre_destino', 'asc')
+        // Sin filtro de 'activa' - ajusta según tu tabla tarifas_destino
+        $tarifas = TarifaDestino::orderBy('nombre_destino', 'asc')
             ->paginate(20);
 
         return view('conductor.tarifas', compact('tarifas'));
