@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\DB;
 
 class ConductorController extends Controller
 {
+    public function dashboard()
+    {
+        // Tu lógica aquí
+        return view('conductor.dashboard');
+    }
     /**
      * Mostrar el formulario de solicitudes de cambio de ruta
      * Ruta: GET /conductor/solicitudes-cambio-ruta
