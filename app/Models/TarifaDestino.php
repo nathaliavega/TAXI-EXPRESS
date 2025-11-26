@@ -6,23 +6,21 @@ use Illuminate\Database\Eloquent\Model;
 
 class TarifaDestino extends Model
 {
-    protected $table = 'tarifas_destinos';
-    protected $primaryKey = 'id_tarifa';
-    public $timestamps = false;
+    protected $table = 'tarifas_destino'; // o el nombre de tu tabla
 
     protected $fillable = [
         'nombre_destino',
         'ciudad',
         'departamento',
         'tarifa_base',
-        'fecha_vigencia_desde',
-        'fecha_vigencia_hasta',
-        'activa'
+        'fecha_inicio',
+        'fecha_fin',
+        'estado'
     ];
 
     protected $casts = [
-        'fecha_vigencia_desde' => 'date',
-        'fecha_vigencia_hasta' => 'date',
-        'activa' => 'boolean',
+        'fecha_inicio' => 'date',
+        'fecha_fin' => 'date',
+        'tarifa_base' => 'decimal:2'
     ];
 }
