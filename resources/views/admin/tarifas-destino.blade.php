@@ -260,7 +260,7 @@
             <div class="col-md-3">
                 <div class="stat-box">
                     <div class="stat-label">Total Destinos</div>
-                    <h2 class="stat-number">{{ $tarifas->total() }}</h2>
+                    <h2 class="stat-number">{{ $tarifas->count() }}</h2>
                 </div>
             </div>
             <div class="col-md-3">
