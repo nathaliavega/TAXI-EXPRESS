@@ -296,7 +296,6 @@
                 <table class="table table-hover mb-0">
                     <thead>
                         <tr>
-                            
                             <th>Destino</th>
                             <th>Ciudad</th>
                             <th>Departamento</th>
@@ -309,7 +308,6 @@
                     <tbody>
                         @forelse($tarifas as $tarifa)
                             <tr>
-                                
                                 <td><strong>{{ $tarifa->nombre_destino }}</strong></td>
                                 <td>{{ $tarifa->ciudad }}</td>
                                 <td>{{ $tarifa->departamento }}</td>
@@ -328,28 +326,28 @@
                                     </span>
                                 </td>
                                 <td class="text-center">
-                                    <button class="action-btn" data-bs-toggle="modal" data-bs-target="#ver{{ $tarifa->id }}" title="Ver">
+                                    <button class="action-btn" data-bs-toggle="modal" data-bs-target="#ver{{ $tarifa->id_tarifa }}" title="Ver">
                                         <i class="fas fa-eye"></i>
                                     </button>
-                                    <button class="action-btn" data-bs-toggle="modal" data-bs-target="#editar{{ $tarifa->id }}" title="Editar">
+                                    <button class="action-btn" data-bs-toggle="modal" data-bs-target="#editar{{ $tarifa->id_tarifa }}" title="Editar">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    @foreach($tarifas as $tarifa)
-                                        <form action="{{ route('admin.tarifas-destino.destroy', $tarifa->id_tarifa_destino) }}" method="POST">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit">Eliminar</button>
-                                        </form>
-                                    @endforeach
+                                    <form action="{{ route('admin.tarifas-destino.destroy', $tarifa->id_tarifa) }}" method="POST" style="display: inline;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="action-btn" title="Eliminar" onclick="return confirm('¿Estás seguro de eliminar esta tarifa?')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
 
                             <!-- Modal Ver -->
-                            <div class="modal fade" id="ver{{ $tarifa->id }}" tabindex="-1">
+                            <div class="modal fade" id="ver{{ $tarifa->id_tarifa }}" tabindex="-1">
                                 <div class="modal-dialog modal-dialog-centered">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title fw-bold">Detalle Tarifa #{{ $tarifa->id }}</h5>
+                                            <h5 class="modal-title fw-bold">Detalle Tarifa #{{ $tarifa->id_tarifa }}</h5>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                         </div>
                                         <div class="modal-body">
@@ -403,7 +401,7 @@
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">Cerrar</button>
-                                            <button type="button" class="btn btn-orange btn-sm" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#editar{{ $tarifa->id }}">
+                                            <button type="button" class="btn btn-orange btn-sm" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#editar{{ $tarifa->id_tarifa }}">
                                                 Editar
                                             </button>
                                         </div>
@@ -412,10 +410,10 @@
                             </div>
 
                             <!-- Modal Editar -->
-                            <div class="modal fade" id="editar{{ $tarifa->id }}" tabindex="-1">
+                            <div class="modal fade" id="editar{{ $tarifa->id_tarifa }}" tabindex="-1">
                                 <div class="modal-dialog modal-dialog-centered">
                                     <div class="modal-content">
-                                        <form action="{{ route('admin.tarifas-destino.update', $tarifa->id) }}" method="POST">
+                                        <form action="{{ route('admin.tarifas-destino.update', $tarifa->id_tarifa) }}" method="POST">
                                             @csrf
                                             @method('PUT')
                                             <div class="modal-header">
@@ -468,7 +466,7 @@
 
                         @empty
                             <tr>
-                                <td colspan="8" class="text-center py-4">
+                                <td colspan="7" class="text-center py-4">
                                     <p class="text-muted mb-0">No hay tarifas registradas</p>
                                 </td>
                             </tr>
@@ -476,9 +474,6 @@
                     </tbody>
                 </table>
             </div>
-
-            
-            
         </div>
     </div>
 
