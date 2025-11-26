@@ -71,14 +71,14 @@ Route::middleware(['auth'])->group(function () {
     });
     
     // Operadora
-    Route::middleware(['checkRole:operadora'])->prefix('operadora')->name('operadora.')->group(function () {
+    Route::middleware(['auth', 'checkRole:operadora'])->prefix('operadora')->name('operadora.')->group(function () {
         Route::get('/dashboard', [OperadoraController::class, 'dashboard'])->name('dashboard');
         Route::get('/control-turnos', [OperadoraController::class, 'controlTurnos'])->name('control-turnos');
+        Route::put('/control-turnos/{id}', [OperadoraController::class, 'updateControlTurno'])->name('control-turnos.update');
+        Route::delete('/control-turnos/{id}', [OperadoraController::class, 'deleteControlTurno'])->name('control-turnos.destroy');
+    
         Route::get('/turnos-obligatorios', [OperadoraController::class, 'turnosObligatorios'])->name('turnos-obligatorios');
         Route::get('/vehiculos', [OperadoraController::class, 'vehiculos'])->name('vehiculos');
-        Route::get('/control-turnos', [ControlTurnosController::class, 'index'])->name('control-turnos');
-        Route::put('/control-turnos/{id}', [ControlTurnosController::class, 'update'])->name('control-turnos.update');
-        Route::delete('/control-turnos/{id}', [ControlTurnosController::class, 'destroy'])->name('control-turnos.destroy');
         
     });
     
