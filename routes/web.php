@@ -5,7 +5,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\OperadoraController;
 use App\Http\Controllers\ConductorController;
 use App\Http\Controllers\TarifaDestinoController;
-use App\Http\Controllers\ControlTurnosController; 
+
 use Illuminate\Support\Facades\Route;
 
 // RUTAS PÚBLICAS
