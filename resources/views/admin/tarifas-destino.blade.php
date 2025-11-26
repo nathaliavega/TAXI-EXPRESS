@@ -287,14 +287,14 @@
         <div class="table-box">
             <div class="table-header d-flex justify-content-between align-items-center">
                 <h6 class="mb-0 fw-bold">Lista de Tarifas</h6>
-                <span class="badge bg-secondary">{{ $tarifas->total() }} registros</span>
+                <span class="badge bg-secondary">{{ $tarifas->count() }} registros</span>
             </div>
             
             <div class="table-responsive">
                 <table class="table table-hover mb-0">
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            
                             <th>Destino</th>
                             <th>Ciudad</th>
                             <th>Departamento</th>
@@ -307,7 +307,7 @@
                     <tbody>
                         @forelse($tarifas as $tarifa)
                             <tr>
-                                <td class="text-muted">{{ $tarifa->id_tarifa }}</td>
+                                
                                 <td><strong>{{ $tarifa->nombre_destino }}</strong></td>
                                 <td>{{ $tarifa->ciudad }}</td>
                                 <td>{{ $tarifa->departamento }}</td>
