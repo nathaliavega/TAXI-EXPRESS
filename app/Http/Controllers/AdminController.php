@@ -104,16 +104,66 @@ class AdminController extends Controller
         
         return view('admin.alertas', compact('alertas'));
     }
-
-
     public function solicitudesCambioRuta()
-    {
-        $solicitudes = SolicitudCambioRuta::with(['conductor', 'vehiculo', 'tarifaDestino', 'autorizadoPor'])
-            ->orderBy('fecha_solicitud', 'desc')
-            ->paginate(20);
+{
+    $solicitudes = SolicitudCambioRuta::with(['conductor', 'vehiculo', 'tarifaDestino', 'autorizadoPor'])
+        ->orderByRaw('CASE WHEN autorizado_por IS NULL THEN 0 ELSE 1 END') // Pendientes primero
+        ->orderBy('fecha_solicitud', 'desc')
+        ->paginate(20);
+    
+    return view('admin.solicitudes-cambio-ruta', compact('solicitudes'));
+}
+    
+    public function aprobarSolicitud($id){
+    try {
+        $solicitud = SolicitudCambioRuta::findOrFail($id);
+
+        // Verificar si ya fue procesada
+        if ($solicitud->autorizado_por) {
+            return redirect()->back()->with('error', 'Esta solicitud ya fue procesada');
+        }
+
+        // Aprobar la solicitud
+        $solicitud->autorizado_por = auth()->id();
+        $solicitud->fecha_autorizacion = now();
+        $solicitud->estado_aprobacion = 'aprobada'; // Si tienes este campo
+        $solicitud->save();
+
+        // Opcional: Actualizar la tarifa del conductor si es necesario
+        if ($solicitud->conductor) {
+            $solicitud->conductor->id_tarifa = $solicitud->id_tarifa;
+            $solicitud->conductor->save();
+        }
+
+        return redirect()->back()->with('success', 'Solicitud aprobada exitosamente');
         
-        return view('admin.solicitudes-cambio-ruta', compact('solicitudes'));
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'Error al aprobar la solicitud: ' . $e->getMessage());
     }
+}
+
+public function rechazarSolicitud($id)
+{
+    try {
+        $solicitud = SolicitudCambioRuta::findOrFail($id);
+
+        // Verificar si ya fue procesada
+        if ($solicitud->autorizado_por) {
+            return redirect()->back()->with('error', 'Esta solicitud ya fue procesada');
+        }
+
+        // Rechazar la solicitud
+        $solicitud->autorizado_por = auth()->id();
+        $solicitud->fecha_autorizacion = now();
+        $solicitud->estado_aprobacion = 'rechazada'; // Si tienes este campo
+        $solicitud->save();
+
+        return redirect()->back()->with('success', 'Solicitud rechazada');
+        
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'Error al rechazar la solicitud: ' . $e->getMessage());
+    }
+}
 
     
     public function tarifasDestino()
