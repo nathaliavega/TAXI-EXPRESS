@@ -19,6 +19,10 @@ class TarifaDestino extends Model
 
     public $timestamps = false;
     
+    protected $attributes = [
+        'estado' => 'Activa'
+    ];
+    
     // Los campos que se pueden llenar
     protected $fillable = [
         'nombre_destino',
