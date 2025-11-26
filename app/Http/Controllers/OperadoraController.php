@@ -7,7 +7,6 @@ use App\Models\ControlTurno;
 use App\Models\TurnoObligatorio;
 use App\Models\Vehiculo;
 use App\Models\Conductor;
-use App\Models\Turno;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -75,14 +74,14 @@ class OperadoraController extends Controller
                 $turno->id_conductor != $validated['conductor_id']) {
                 
                 // Buscar o crear el turno con el nuevo vehículo/conductor
-                $turno = Turno::firstOrCreate(
+                $turno = TurnoObligatorio::firstOrCreate(
                     [
                         'id_vehiculo' => $validated['vehiculo_id'],
-                        'id_conductor' => $validated['conductor_id']
+                        'id_conductor' => $validated['conductor_id'],
+                        'fecha_turno' => Carbon::today()
                     ],
                     [
-                        'estado' => 'activo',
-                        'fecha_turno' => Carbon::today()
+                        'estado' => 'activo'
                     ]
                 );
                 
