@@ -274,6 +274,17 @@
             }, 3000);
         }
 
+        // Función auxiliar para convertir hora a formato HH:MM
+        function formatTime(time) {
+            if (!time) return '';
+            // Si viene en formato HH:MM:SS, extraer solo HH:MM
+            const parts = time.trim().split(':');
+            if (parts.length >= 2) {
+                return `${parts[0].padStart(2, '0')}:${parts[1].padStart(2, '0')}`;
+            }
+            return time.trim();
+        }
+
         function editRow(id) {
             if (editingRow) {
                 showAlert('Ya hay una fila en edición. Guarda o cancela primero.', 'error');
@@ -289,20 +300,22 @@
                 vehiculoId: row.querySelector('.vehiculo-cell').dataset.vehiculoId,
                 conductorId: row.querySelector('.conductor-cell').dataset.conductorId,
                 franja: row.querySelector('.franja-cell').dataset.franja,
-                horaInicio: row.querySelector('.hora-inicio-cell').textContent,
-                horaFin: row.querySelector('.hora-fin-cell').textContent,
-                horaLlamado: row.querySelector('.hora-llamado-cell').textContent,
+                horaInicio: formatTime(row.querySelector('.hora-inicio-cell').textContent),
+                horaFin: formatTime(row.querySelector('.hora-fin-cell').textContent),
+                horaLlamado: formatTime(row.querySelector('.hora-llamado-cell').textContent),
                 respondio: row.querySelector('.respondio-cell .badge').classList.contains('si'),
                 enServicio: row.querySelector('.servicio-cell .badge').classList.contains('si')
             };
+
+            console.log('Datos originales capturados:', originalData);
 
             // Convertir celdas a inputs/selects
             row.querySelector('.vehiculo-cell').innerHTML = createSelectVehiculos(originalData.vehiculoId);
             row.querySelector('.conductor-cell').innerHTML = createSelectConductores(originalData.conductorId);
             row.querySelector('.franja-cell').innerHTML = createSelectFranja(originalData.franja);
-            row.querySelector('.hora-inicio-cell').innerHTML = `<input type="time" class="edit-input" value="${originalData.horaInicio}">`;
-            row.querySelector('.hora-fin-cell').innerHTML = `<input type="time" class="edit-input" value="${originalData.horaFin}">`;
-            row.querySelector('.hora-llamado-cell').innerHTML = `<input type="time" class="edit-input" value="${originalData.horaLlamado}">`;
+            row.querySelector('.hora-inicio-cell').innerHTML = `<input type="time" class="edit-input" value="${originalData.horaInicio}" step="60">`;
+            row.querySelector('.hora-fin-cell').innerHTML = `<input type="time" class="edit-input" value="${originalData.horaFin}" step="60">`;
+            row.querySelector('.hora-llamado-cell').innerHTML = `<input type="time" class="edit-input" value="${originalData.horaLlamado}" step="60">`;
             row.querySelector('.respondio-cell').innerHTML = createToggle('respondio', originalData.respondio);
             row.querySelector('.servicio-cell').innerHTML = createToggle('servicio', originalData.enServicio);
 
@@ -354,8 +367,8 @@
             
             // Recoger datos del formulario
             const data = {
-                vehiculo_id: row.querySelector('.vehiculo-cell select').value,
-                conductor_id: row.querySelector('.conductor-cell select').value,
+                vehiculo_id: parseInt(row.querySelector('.vehiculo-cell select').value),
+                conductor_id: parseInt(row.querySelector('.conductor-cell select').value),
                 nombre_franja: row.querySelector('.franja-cell select').value,
                 hora_inicio: row.querySelector('.hora-inicio-cell input').value,
                 hora_fin: row.querySelector('.hora-fin-cell input').value,
@@ -364,9 +377,19 @@
                 en_servicio: row.querySelector('.servicio-cell input[type="checkbox"]').checked ? 1 : 0
             };
 
+            // Debug: mostrar datos que se van a enviar
+            console.log('Datos a enviar:', data);
+
             // Validar datos
             if (!data.hora_inicio || !data.hora_fin || !data.hora_llamado) {
                 showAlert('Todos los horarios son obligatorios', 'error');
+                return;
+            }
+
+            // Validar formato de hora (HH:MM)
+            const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
+            if (!timeRegex.test(data.hora_inicio) || !timeRegex.test(data.hora_fin) || !timeRegex.test(data.hora_llamado)) {
+                showAlert('El formato de las horas debe ser HH:MM (24 horas)', 'error');
                 return;
             }
 
@@ -416,7 +439,14 @@
                     row.classList.remove('editing');
                     editingRow = null;
                 } else {
-                    showAlert(result.message || 'Error al actualizar el turno', 'error');
+                    // Mostrar errores específicos de validación si existen
+                    if (result.errors) {
+                        const errorMessages = Object.values(result.errors).flat().join(', ');
+                        showAlert('Errores: ' + errorMessages, 'error');
+                    } else {
+                        showAlert(result.message || 'Error al actualizar el turno', 'error');
+                    }
+                    console.error('Respuesta del servidor:', result);
                 }
             } catch (error) {
                 showAlert('Error de conexión. Inténtalo de nuevo.', 'error');
