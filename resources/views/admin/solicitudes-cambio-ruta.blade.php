@@ -11,7 +11,7 @@
 <!-- Header con gradiente -->
 <div class="bg-gradient-header text-white py-3 px-4">
     <div class="d-flex justify-content-between align-items-center">
-        <h1 class="mb-0 fs-3 fw-bold">Gestión de Solicitudes de Cambio de Ruta</h1>
+        <h1 class="mb-0 fs-3 fw-bold">Control de Solicitudes</h1>
         <button onclick="window.history.back()" class="btn btn-light">
             <i class="fas fa-arrow-left me-2"></i>Volver al Dashboard
         </button>

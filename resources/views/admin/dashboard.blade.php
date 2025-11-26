@@ -9,7 +9,7 @@
         body { font-family: Arial, sans-serif; background: #f4f4f4; }
         
         .navbar {
-            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            background: #ff6347;
             color: white;
             padding: 15px 30px;
             display: flex;
@@ -19,7 +19,7 @@
         .navbar h1 { font-size: 22px; }
         .btn-logout {
             background: white;
-            color: #ff6b35;
+            color: #ff6347;
             border: none;
             padding: 8px 15px;
             border-radius: 5px;
@@ -45,7 +45,7 @@
             align-items: center;
             gap: 8px;
             padding: 12px 18px;
-            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            background: #ff6347;
             color: white;
             text-decoration: none;
             border-radius: 8px;
@@ -54,9 +54,9 @@
             transition: all 0.3s ease;
         }
         .menu-nav a:hover {
-            background: linear-gradient(135deg, #ff5722, #f57c00);
+            background: #ff4529;
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255,107,53,0.4);
+            box-shadow: 0 4px 12px rgba(255,99,71,0.4);
         }
         
         .stats-grid {
@@ -70,16 +70,16 @@
             padding: 25px;
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            border-left: 4px solid #ff6b35;
+            border-left: 4px solid #ff6347;
         }
         .stat-card h3 { color: #666; font-size: 14px; margin-bottom: 10px; }
-        .stat-card .number { font-size: 36px; font-weight: bold; color: #ff6b35; }
+        .stat-card .number { font-size: 36px; font-weight: bold; color: #ff6347; }
         .stat-card.alertas { border-left-color: #e53e3e; }
         .stat-card.alertas .number { color: #e53e3e; }
-        .stat-card.success { border-left-color: #38a169; }
-        .stat-card.success .number { color: #38a169; }
-        .stat-card.warning { border-left-color: #dd6b20; }
-        .stat-card.warning .number { color: #dd6b20; }
+        .stat-card.success { border-left-color: #28a745; }
+        .stat-card.success .number { color: #28a745; }
+        .stat-card.warning { border-left-color: #ffc107; }
+        .stat-card.warning .number { color: #ffc107; }
         
         .content-grid {
             display: grid;
@@ -95,7 +95,7 @@
             margin-bottom: 20px;
         }
         .section h2 {
-            color: #ff6b35;
+            color: #ff6347;
             margin-bottom: 20px;
             padding-bottom: 10px;
             border-bottom: 2px solid #e9ecef;
@@ -106,7 +106,7 @@
         }
         .section h2 a {
             font-size: 13px;
-            color: #ff6b35;
+            color: #ff6347;
             text-decoration: none;
         }
         .section h2 a:hover { text-decoration: underline; }
@@ -116,7 +116,7 @@
             margin-bottom: 10px;
             background: #f9f9f9;
             border-radius: 0 8px 8px 0;
-            border-left: 4px solid #ff6b35;
+            border-left: 4px solid #ff6347;
         }
         .list-item:hover { background: #fff5f0; }
         .list-item strong { color: #333; }
@@ -128,9 +128,9 @@
             border-radius: 0 8px 8px 0;
         }
         .alert-item.critica { border-left: 4px solid #e53e3e; background: #fff5f5; }
-        .alert-item.alta { border-left: 4px solid #dd6b20; background: #fffaf0; }
-        .alert-item.media { border-left: 4px solid #d69e2e; background: #fffff0; }
-        .alert-item.baja { border-left: 4px solid #38a169; background: #f0fff4; }
+        .alert-item.alta { border-left: 4px solid #ff6347; background: #fff5f0; }
+        .alert-item.media { border-left: 4px solid #ffc107; background: #fffbeb; }
+        .alert-item.baja { border-left: 4px solid #28a745; background: #f0fff4; }
         .alert-item strong { color: #333; display: block; margin-bottom: 5px; }
         .alert-item p { font-size: 14px; color: #555; margin: 5px 0; }
         .alert-item small { font-size: 12px; color: #888; }
@@ -143,20 +143,20 @@
             font-weight: bold;
         }
         .badge.critica { background: #e53e3e; color: white; }
-        .badge.alta { background: #dd6b20; color: white; }
-        .badge.media { background: #d69e2e; color: #333; }
-        .badge.baja { background: #38a169; color: white; }
-        .badge.success { background: #38a169; color: white; }
-        .badge.warning { background: #d69e2e; color: #333; }
+        .badge.alta { background: #ff6347; color: white; }
+        .badge.media { background: #ffc107; color: #333; }
+        .badge.baja { background: #28a745; color: white; }
+        .badge.success { background: #28a745; color: white; }
+        .badge.warning { background: #ffc107; color: #333; }
         .badge.danger { background: #e53e3e; color: white; }
-        .badge.info { background: #ff6b35; color: white; }
+        .badge.info { background: #ff6347; color: white; }
         .badge.secondary { background: #718096; color: white; }
         
         table { width: 100%; border-collapse: collapse; }
         table th {
             text-align: left;
             padding: 12px;
-            background: #ff6b35;
+            background: #ff6347;
             color: white;
             font-size: 13px;
         }
@@ -181,8 +181,8 @@
             border-radius: 8px;
             margin-bottom: 20px;
         }
-        .alert-box.success { background: #c6f6d5; color: #22543d; border-left: 4px solid #38a169; }
-        .alert-box.error { background: #fed7d7; color: #742a2a; border-left: 4px solid #e53e3e; }
+        .alert-box.success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .alert-box.error { background: #f8d7da; color: #721c24; border-left: 4px solid #e53e3e; }
         
         @media (max-width: 768px) {
             .content-grid { grid-template-columns: 1fr; }
@@ -216,7 +216,7 @@
             <a href="{{ route('admin.conductores') }}">👥 Conductores</a>
             <a href="{{ route('admin.propietarios') }}">🏢 Propietarios</a>
             <a href="{{ route('admin.alertas') }}">⚠️ Alertas</a>
-            <a href="{{ route('admin.solicitudes-cambio-ruta') }}">📝 Solicitudes Ruta</a>
+            <a href="{{ route('admin.solicitudes-cambio-ruta') }}">📝 Control de Solicitudes</a>
             <a href="{{ route('admin.tarifas-destino') }}">💰 Tarifas</a>
             <a href="{{ route('admin.mantenimiento-general') }}">🔧 Mantenimientos</a>
         </div>
@@ -265,7 +265,7 @@
                     <div class="list-item">
                         <strong>{{ $solicitud->conductor->primer_nombre ?? 'N/A' }} {{ $solicitud->conductor->primer_apellido ?? '' }}</strong>
                         <span class="badge {{ $solicitud->autorizado_por ? 'success' : 'warning' }}">{{ $solicitud->autorizado_por ? 'Autorizado' : 'Pendiente' }}</span>
-                        <div class="meta">🚐 {{ $solicitud->vehiculo->placa ?? 'N/A' }} | 📍 {{ $solicitud->tarifaDestino->nombre_destino ?? $solicitud->direccion_destino ?? 'N/A' }}</div>
+                        <div class="meta">🚐 {{ $solicitud->vehiculo->placa ?? (/A' }} | 📍 {{ $solicitud->tarifaDestino->nombre_destino ?? $solicitud->direccion_destino ?? 'N/A' }}</div>
                         <div class="meta">📅 {{ \Carbon\Carbon::parse($solicitud->fecha_viaje_programada)->format('d/m/Y H:i') }}</div>
                     </div>
                 @empty
@@ -320,7 +320,7 @@
                             <tr>
                                 <td><strong>{{ $tarifa->nombre_destino }}</strong></td>
                                 <td>{{ $tarifa->ciudad }}</td>
-                                <td><strong style="color: #38a169;">${{ number_format($tarifa->tarifa_base, 0, ',', '.') }}</strong></td>
+                                <td><strong style="color: #28a745;">${{ number_format($tarifa->tarifa_base, 0, ',', '.') }}</strong></td>
                                 <td><span class="badge {{ $tarifa->activa ? 'success' : 'secondary' }}">{{ $tarifa->activa ? 'Activa' : 'Inactiva' }}</span></td>
                             </tr>
                         @empty
