@@ -15,13 +15,20 @@ class SolicitudCambioRuta extends Model
 
     protected $fillable = [
         'id_conductor',
-        'id_tarifa_actual',
-        'id_tarifa_solicitada',
-        'motivo',
-        'estado',
+        'id_vehiculo',
+        'id_tarifa_destino',
+        'fecha_viaje_programada',
+        'nombre_contratante',
+        'documento_contratante',
+        'telefono_contratante',
+        'direccion_origen',
+        'direccion_destino',
+        'numero_pasajeros',
+        'tarifa_cobrada',
+        'autorizado_por',
         'fecha_solicitud',
-        'fecha_respuesta',
-        'respuesta_admin'
+        'fecha_inicio_real',
+        'fecha_respuesta'
     ];
 
     protected $casts = [
