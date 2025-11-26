@@ -216,11 +216,11 @@
             </thead>
             <tbody>
                 @forelse($controles as $control)
-                    <tr id="row-{{ $control->id }}" data-id="{{ $control->id }}">
-                        <td class="vehiculo-cell" data-vehiculo-id="{{ $control->turno->vehiculo->id }}">
+                    <tr id="row-{{ $control->id_control }}" data-id="{{ $control->id_control }}">
+                        <td class="vehiculo-cell" data-vehiculo-id="{{ $control->turno->vehiculo->id_vehiculo }}">
                             {{ $control->turno->vehiculo->placa }}
                         </td>
-                        <td class="conductor-cell" data-conductor-id="{{ $control->turno->conductor->id }}">
+                        <td class="conductor-cell" data-conductor-id="{{ $control->turno->conductor->id_conductor }}">
                             {{ $control->turno->conductor->primer_nombre }} {{ $control->turno->conductor->primer_apellido }}
                         </td>
                         <td class="franja-cell" data-franja="{{ $control->nombre_franja }}">
@@ -240,8 +240,8 @@
                             </span>
                         </td>
                         <td class="actions-cell">
-                            <button class="btn btn-edit" onclick="editRow({{ $control->id }})">Editar</button>
-                            <button class="btn btn-delete" onclick="deleteRow({{ $control->id }})">Eliminar</button>
+                            <button class="btn btn-edit" onclick="editRow({{ $control->id_control }})">Editar</button>
+                            <button class="btn btn-delete" onclick="deleteRow({{ $control->id_control }})">Eliminar</button>
                         </td>
                     </tr>
                 @empty

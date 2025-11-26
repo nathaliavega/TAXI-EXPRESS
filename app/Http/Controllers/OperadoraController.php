@@ -32,12 +32,13 @@ class OperadoraController extends Controller
         ->paginate(20);
 
         // Obtener todos los vehículos y conductores para los selects de edición
-        $vehiculos = Vehiculo::select('id', 'placa')
+        // Usar los nombres correctos de las columnas de tu base de datos
+        $vehiculos = Vehiculo::select('id_vehiculo as id', 'placa')
             ->where('estado', 'activo')
             ->orderBy('placa')
             ->get();
 
-        $conductores = Conductor::select('id', 'primer_nombre', 'primer_apellido')
+        $conductores = Conductor::select('id_conductor as id', 'primer_nombre', 'primer_apellido')
             ->where('estado', 'activo')
             ->orderBy('primer_nombre')
             ->get();
@@ -53,8 +54,8 @@ class OperadoraController extends Controller
         try {
             // Validar datos
             $validated = $request->validate([
-                'vehiculo_id' => 'required|exists:vehiculos,id',
-                'conductor_id' => 'required|exists:conductores,id',
+                'vehiculo_id' => 'required|exists:vehiculos,id_vehiculo',
+                'conductor_id' => 'required|exists:conductores,id_conductor',
                 'nombre_franja' => 'required|in:Turno_noche,Turno_mañana',
                 'hora_inicio' => 'required|date_format:H:i',
                 'hora_fin' => 'required|date_format:H:i|after:hora_inicio',
@@ -65,19 +66,19 @@ class OperadoraController extends Controller
 
             DB::beginTransaction();
 
-            // Encontrar el control de turno
-            $control = ControlTurno::findOrFail($id);
+            // Encontrar el control de turno usando la primary key correcta
+            $control = ControlTurno::where('id_control', $id)->firstOrFail();
             
             // Actualizar el turno asociado si cambió el vehículo o conductor
             $turno = $control->turno;
-            if ($turno->vehiculo_id != $validated['vehiculo_id'] || 
-                $turno->conductor_id != $validated['conductor_id']) {
+            if ($turno->id_vehiculo != $validated['vehiculo_id'] || 
+                $turno->id_conductor != $validated['conductor_id']) {
                 
                 // Buscar o crear el turno con el nuevo vehículo/conductor
                 $turno = Turno::firstOrCreate(
                     [
-                        'vehiculo_id' => $validated['vehiculo_id'],
-                        'conductor_id' => $validated['conductor_id']
+                        'id_vehiculo' => $validated['vehiculo_id'],
+                        'id_conductor' => $validated['conductor_id']
                     ],
                     [
                         'estado' => 'activo',
@@ -85,7 +86,7 @@ class OperadoraController extends Controller
                     ]
                 );
                 
-                $control->turno_id = $turno->id;
+                $control->id_turno = $turno->id_turno;
             }
 
             // Actualizar el control
@@ -129,7 +130,8 @@ class OperadoraController extends Controller
     public function deleteControlTurno($id)
     {
         try {
-            $control = ControlTurno::findOrFail($id);
+            // Usar la primary key correcta
+            $control = ControlTurno::where('id_control', $id)->firstOrFail();
             $control->delete();
 
             return response()->json([
