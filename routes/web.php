@@ -52,6 +52,8 @@ Route::middleware(['auth'])->group(function () {
             ->name('solicitudes.aprobar');
         Route::patch('/solicitudes/rechazar/{id}', [AdminController::class, 'rechazarSolicitud'])
             ->name('solicitudes.rechazar');
+         Route::get('/tarifas-destino', [TarifaDestinoController::class, 'index'])
+        ->name('admin.tarifas-destino');    
         Route::get('tarifas-destino', [TarifaDestinoController::class, 'index'])->name('tarifas-destino.index');
         Route::post('tarifas-destino', [TarifaDestinoController::class, 'store'])->name('tarifas-destino.store');
     });
