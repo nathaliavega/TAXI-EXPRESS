@@ -322,7 +322,7 @@
                                 </td>
                                 <td class="text-center">
                                     <span class="status-badge {{ $tarifa->estado == 'Activa' ? 'status-active' : 'status-inactive' }}">
-                                        {{ $estado }}
+                                        {{ $tarifa->estado }}
                                     </span>
                                 </td>
                                 <td class="text-center">
