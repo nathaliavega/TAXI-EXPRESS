@@ -58,15 +58,6 @@
             margin-bottom: 1.5rem;
         }
 
-        /* Filtros */
-        .filters-box {
-            background: white;
-            padding: 1.25rem;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 1.5rem;
-        }
-
         /* Tabla */
         .table-box {
             background: white;
@@ -255,18 +246,29 @@
             </div>
         @endif
 
+        @if($errors->any())
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <ul class="mb-0">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+
         <!-- Estadísticas -->
         <div class="row g-3 mb-4">
             <div class="col-md-3">
                 <div class="stat-box">
                     <div class="stat-label">Total Destinos</div>
-                    <h2 class="stat-number">{{ $tarifas->count() }}</h2>
+                    <h2 class="stat-number">{{ $tarifas->total() }}</h2>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat-box">
                     <div class="stat-label">Tarifas Activas</div>
-                    <h2 class="stat-number">{{ $tarifas->where('activa', true)->count() }}</h2>
+                    <h2 class="stat-number">{{ $tarifas->where('estado', 'Activa')->count() }}</h2>
                 </div>
             </div>
             <div class="col-md-3">
@@ -287,14 +289,14 @@
         <div class="table-box">
             <div class="table-header d-flex justify-content-between align-items-center">
                 <h6 class="mb-0 fw-bold">Lista de Tarifas</h6>
-                <span class="badge bg-secondary">{{ $tarifas->count() }} registros</span>
+                <span class="badge bg-secondary">{{ $tarifas->total() }} registros</span>
             </div>
             
             <div class="table-responsive">
                 <table class="table table-hover mb-0">
                     <thead>
                         <tr>
-                            
+                            <th>ID</th>
                             <th>Destino</th>
                             <th>Ciudad</th>
                             <th>Departamento</th>
@@ -307,53 +309,53 @@
                     <tbody>
                         @forelse($tarifas as $tarifa)
                             <tr>
-                                
+                                <td>{{ $tarifa->id }}</td>
                                 <td><strong>{{ $tarifa->nombre_destino }}</strong></td>
                                 <td>{{ $tarifa->ciudad }}</td>
                                 <td>{{ $tarifa->departamento }}</td>
                                 <td class="text-end"><strong class="text-success">${{ number_format($tarifa->tarifa_base, 0) }}</strong></td>
                                 <td>
                                     <small class="text-muted">
-                                        {{ \Carbon\Carbon::parse($tarifa->fecha_vigencia_desde)->format('d/m/Y') }}
-                                        @if($tarifa->fecha_vigencia_hasta)
-                                            - {{ \Carbon\Carbon::parse($tarifa->fecha_vigencia_hasta)->format('d/m/Y') }}
+                                        {{ \Carbon\Carbon::parse($tarifa->fecha_inicio)->format('d/m/Y') }}
+                                        @if($tarifa->fecha_fin)
+                                            - {{ \Carbon\Carbon::parse($tarifa->fecha_fin)->format('d/m/Y') }}
                                         @endif
                                     </small>
                                 </td>
                                 <td class="text-center">
-                                    <span class="status-badge {{ $tarifa->activa ? 'status-active' : 'status-inactive' }}">
-                                        {{ $tarifa->activa ? 'Activa' : 'Inactiva' }}
+                                    <span class="status-badge {{ $tarifa->estado == 'Activa' ? 'status-active' : 'status-inactive' }}">
+                                        {{ $tarifa->estado }}
                                     </span>
                                 </td>
                                 <td class="text-center">
-                                    <button class="action-btn" data-bs-toggle="modal" data-bs-target="#ver{{ $tarifa->id_tarifa }}" title="Ver">
+                                    <button class="action-btn" data-bs-toggle="modal" data-bs-target="#ver{{ $tarifa->id }}" title="Ver">
                                         <i class="fas fa-eye"></i>
                                     </button>
-                                    <button class="action-btn" data-bs-toggle="modal" data-bs-target="#editar{{ $tarifa->id_tarifa }}" title="Editar">
+                                    <button class="action-btn" data-bs-toggle="modal" data-bs-target="#editar{{ $tarifa->id }}" title="Editar">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <form action="{{ route('admin.tarifas-destino', $tarifa->id_tarifa) }}" method="POST" class="d-inline">
+                                    <form action="{{ route('admin.tarifas-destino.destroy', $tarifa->id) }}" method="POST" class="d-inline">
                                         @csrf
-                                        @method('PATCH')
-                                        <button type="submit" class="action-btn" title="{{ $tarifa->activa ? 'Desactivar' : 'Activar' }}">
-                                            <i class="fas fa-{{ $tarifa->activa ? 'ban' : 'check' }}"></i>
+                                        @method('DELETE')
+                                        <button type="submit" class="action-btn" title="Eliminar" onclick="return confirm('¿Estás seguro de eliminar esta tarifa?')">
+                                            <i class="fas fa-trash"></i>
                                         </button>
                                     </form>
                                 </td>
                             </tr>
 
                             <!-- Modal Ver -->
-                            <div class="modal fade" id="ver{{ $tarifa->id_tarifa }}" tabindex="-1">
+                            <div class="modal fade" id="ver{{ $tarifa->id }}" tabindex="-1">
                                 <div class="modal-dialog modal-dialog-centered">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title fw-bold">Detalle Tarifa #{{ $tarifa->id_tarifa }}</h5>
+                                            <h5 class="modal-title fw-bold">Detalle Tarifa #{{ $tarifa->id }}</h5>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                         </div>
                                         <div class="modal-body">
                                             <div class="mb-3">
-                                                <span class="status-badge {{ $tarifa->activa ? 'status-active' : 'status-inactive' }}">
-                                                    {{ $tarifa->activa ? 'Activa' : 'Inactiva' }}
+                                                <span class="status-badge {{ $tarifa->estado == 'Activa' ? 'status-active' : 'status-inactive' }}">
+                                                    {{ $tarifa->estado }}
                                                 </span>
                                             </div>
                                             <div class="detail-row">
@@ -382,15 +384,15 @@
                                                 <div class="col-6">
                                                     <div class="detail-row">
                                                         <div class="detail-label">Inicio</div>
-                                                        <div class="detail-value">{{ \Carbon\Carbon::parse($tarifa->fecha_vigencia_desde)->format('d/m/Y') }}</div>
+                                                        <div class="detail-value">{{ \Carbon\Carbon::parse($tarifa->fecha_inicio)->format('d/m/Y') }}</div>
                                                     </div>
                                                 </div>
                                                 <div class="col-6">
                                                     <div class="detail-row">
                                                         <div class="detail-label">Fin</div>
                                                         <div class="detail-value">
-                                                            @if($tarifa->fecha_vigencia_hasta)
-                                                                {{ \Carbon\Carbon::parse($tarifa->fecha_vigencia_hasta)->format('d/m/Y') }}
+                                                            @if($tarifa->fecha_fin)
+                                                                {{ \Carbon\Carbon::parse($tarifa->fecha_fin)->format('d/m/Y') }}
                                                             @else
                                                                 <span class="text-success">Sin límite</span>
                                                             @endif
@@ -401,7 +403,7 @@
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">Cerrar</button>
-                                            <button type="button" class="btn btn-orange btn-sm" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#editar{{ $tarifa->id_tarifa }}">
+                                            <button type="button" class="btn btn-orange btn-sm" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#editar{{ $tarifa->id }}">
                                                 Editar
                                             </button>
                                         </div>
@@ -410,10 +412,10 @@
                             </div>
 
                             <!-- Modal Editar -->
-                            <div class="modal fade" id="editar{{ $tarifa->id_tarifa }}" tabindex="-1">
+                            <div class="modal fade" id="editar{{ $tarifa->id }}" tabindex="-1">
                                 <div class="modal-dialog modal-dialog-centered">
                                     <div class="modal-content">
-                                        <form action="{{ route('admin.tarifas-destino', $tarifa->id_tarifa) }}" method="POST">
+                                        <form action="{{ route('admin.tarifas-destino.update', $tarifa->id) }}" method="POST">
                                             @csrf
                                             @method('PUT')
                                             <div class="modal-header">
@@ -440,24 +442,24 @@
                                                 <div class="row">
                                                     <div class="col-6 mb-3">
                                                         <label class="form-label">Fecha Inicio *</label>
-                                                        <input type="date" name="fecha_vigencia_desde" class="form-control" value="{{ $tarifa->fecha_vigencia_desde }}" required>
+                                                        <input type="date" name="fecha_inicio" class="form-control" value="{{ $tarifa->fecha_inicio }}" required>
                                                     </div>
                                                     <div class="col-6 mb-3">
                                                         <label class="form-label">Fecha Fin</label>
-                                                        <input type="date" name="fecha_vigencia_hasta" class="form-control" value="{{ $tarifa->fecha_vigencia_hasta }}">
+                                                        <input type="date" name="fecha_fin" class="form-control" value="{{ $tarifa->fecha_fin }}">
                                                     </div>
                                                 </div>
                                                 <div class="mb-0">
                                                     <label class="form-label">Estado</label>
-                                                    <select name="activa" class="form-select">
-                                                        <option value="1" {{ $tarifa->activa ? 'selected' : '' }}>Activa</option>
-                                                        <option value="0" {{ !$tarifa->activa ? 'selected' : '' }}>Inactiva</option>
+                                                    <select name="estado" class="form-select">
+                                                        <option value="Activa" {{ $tarifa->estado == 'Activa' ? 'selected' : '' }}>Activa</option>
+                                                        <option value="Inactiva" {{ $tarifa->estado == 'Inactiva' ? 'selected' : '' }}>Inactiva</option>
                                                     </select>
                                                 </div>
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">Cancelar</button>
-                                                <button type="submit" class="btn btn-orange btn-sm">Guardar</button>
+                                                <button type="submit" class="btn btn-orange btn-sm">Actualizar Tarifa</button>
                                             </div>
                                         </form>
                                     </div>
@@ -476,7 +478,11 @@
             </div>
 
             <!-- Paginación -->
-           
+            @if($tarifas->hasPages())
+                <div class="p-3">
+                    {{ $tarifas->links() }}
+                </div>
+            @endif
         </div>
     </div>
 
@@ -484,7 +490,7 @@
     <div class="modal fade" id="nuevaTarifa" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <form action="{{ route('admin.tarifas-destino') }}" method="POST">
+                <form action="{{ route('admin.tarifas-destino.store') }}" method="POST">
                     @csrf
                     <div class="modal-header">
                         <h5 class="modal-title fw-bold">Nueva Tarifa</h5>
@@ -493,34 +499,34 @@
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Nombre del Destino *</label>
-                            <input type="text" name="nombre_destino" class="form-control" placeholder="Ej: San Gil Centro" required>
+                            <input type="text" name="nombre_destino" class="form-control" placeholder="Ej: San Gil Centro" value="{{ old('nombre_destino') }}" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Ciudad *</label>
-                            <input type="text" name="ciudad" class="form-control" placeholder="Ej: San Gil" required>
+                            <input type="text" name="ciudad" class="form-control" placeholder="Ej: San Gil" value="{{ old('ciudad') }}" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Departamento *</label>
-                            <input type="text" name="departamento" class="form-control" placeholder="Ej: Santander" required>
+                            <input type="text" name="departamento" class="form-control" placeholder="Ej: Santander" value="{{ old('departamento') }}" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Tarifa Base *</label>
-                            <input type="number" name="tarifa_base" class="form-control" placeholder="Ej: 450000" required>
+                            <input type="number" name="tarifa_base" class="form-control" placeholder="Ej: 450000" value="{{ old('tarifa_base') }}" required>
                         </div>
                         <div class="row">
                             <div class="col-6 mb-3">
                                 <label class="form-label">Fecha Inicio *</label>
-                                <input type="date" name="fecha_vigencia_desde" class="form-control" required>
+                                <input type="date" name="fecha_inicio" class="form-control" value="{{ old('fecha_inicio') }}" required>
                             </div>
                             <div class="col-6">
                                 <label class="form-label">Fecha Fin</label>
-                                <input type="date" name="fecha_vigencia_hasta" class="form-control">
+                                <input type="date" name="fecha_fin" class="form-control" value="{{ old('fecha_fin') }}">
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-orange btn-sm">Guardar</button>
+                        <button type="submit" class="btn btn-orange btn-sm">Crear Tarifa</button>
                     </div>
                 </form>
             </div>
