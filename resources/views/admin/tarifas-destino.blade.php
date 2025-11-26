@@ -334,11 +334,11 @@
                                     <button class="action-btn" data-bs-toggle="modal" data-bs-target="#editar{{ $tarifa->id }}" title="Editar">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <form action="{{ route('admin.tarifas-destino.destroy', $tarifa->id) }}" method="POST" class="d-inline">
+                                    <form action="{{ route('admin.tarifas-destino.destroy', $tarifa->id_tarifa_destino) }}" method="POST" style="display: inline;">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="action-btn" title="Eliminar" onclick="return confirm('¿Estás seguro de eliminar esta tarifa?')">
-                                            <i class="fas fa-trash"></i>
+                                        <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar esta tarifa?')">
+                                            Eliminar
                                         </button>
                                     </form>
                                 </td>
