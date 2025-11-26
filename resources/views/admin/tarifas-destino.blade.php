@@ -476,11 +476,7 @@
             </div>
 
             <!-- Paginación -->
-            @if($tarifas->hasPages())
-            <div class="p-3 border-top">
-                {{ $tarifas->links() }}
-            </div>
-            @endif
+           
         </div>
     </div>
 
