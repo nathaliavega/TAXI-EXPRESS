@@ -163,10 +163,9 @@ class ConductorController extends Controller
         ->paginate(20);
 
          // Solo los vehículos asignados a este conductor
-        $vehiculos = Vehiculo::where('activo', true)
-            ->where('id_conductor', $conductor->id_conductor)
-            ->orderBy('placa')
-            ->get();
+        $vehiculos = Vehiculo::where('id_conductor', $conductor->id_conductor)
+        ->orderBy('placa')
+        ->get();
         
         $tarifas = TarifaDestino::where('activa', true)
             ->orderBy('nombre_destino')
