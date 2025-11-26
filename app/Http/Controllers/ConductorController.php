@@ -218,7 +218,7 @@ class ConductorController extends Controller
     // Validar los datos del formulario
     $validated = $request->validate([
         'id_vehiculo' => 'required|exists:vehiculos,id_vehiculo',
-        'id_tarifa_destino' => 'required|exists:tarifas_destinos,id_tarifa',
+        'id_tarifa_destino' => 'nullable|exists:tarifas_destinos,id_tarifa',
         'fecha_viaje_programada' => 'required|date|after:now',
         'nombre_contratante' => 'required|string|max:200',
         'documento_contratante' => 'required|string|max:50',

@@ -366,6 +366,20 @@
                  </div>
             </div>
 
+             <div class="form-group">
+            <label class="form-label">
+                Tarifa/Destino <span class="required">*</span>
+            </label>
+            <select name="id_tarifa_destino" required class="form-select">
+                <option value="">Seleccionar tarifa...</option>
+                @foreach($tarifas as $tarifa)
+                    <option value="{{ $tarifa->id_tarifa }}" {{ old('id_tarifa_destino') == $tarifa->id_tarifa ? 'selected' : '' }}>
+                        {{ $tarifa->nombre_destino }} - ${{ number_format($tarifa->tarifa_base, 0) }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+
                 <!-- Sección: Información del Contratante -->
                 <div class="form-section">
                     <h3 class="section-title">
