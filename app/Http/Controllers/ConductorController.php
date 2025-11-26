@@ -162,15 +162,21 @@ class ConductorController extends Controller
         ->orderBy('fecha_solicitud', 'desc')
         ->paginate(20);
 
-         // Solo los vehículos asignados a este conductor
+         $vehiculosIds = TurnoObligatorio::where('id_conductor', $conductor->id_conductor)
+        ->distinct()
+        ->pluck('id_vehiculo');
+
         $vehiculos = Vehiculo::where('id_conductor', $conductor->id_conductor)
         ->orderBy('placa')
         ->get();
+
+        if ($vehiculos->isEmpty()) {
+        $vehiculos = Vehiculo::orderBy('placa')->get();
+       }
         
         $tarifas = TarifaDestino::where('activa', true)
             ->orderBy('nombre_destino')
             ->get();
-
         return view('conductor.solicitudes-cambio-ruta', compact('solicitudes', 'conductor', 'vehiculos', 'tarifas'));
     }
 
