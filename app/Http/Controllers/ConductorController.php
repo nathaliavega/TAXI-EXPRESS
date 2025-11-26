@@ -165,15 +165,16 @@ class ConductorController extends Controller
          $vehiculosIds = TurnoObligatorio::where('id_conductor', $conductor->id_conductor)
         ->distinct()
         ->pluck('id_vehiculo');
-
-        $vehiculos = Vehiculo::where('id_conductor', $conductor->id_conductor)
-        ->orderBy('placa')
-        ->get();
-
-        if ($vehiculos->isEmpty()) {
-        $vehiculos = Vehiculo::orderBy('placa')->get();
-       }
-        
+            
+        // Cargar vehículos basados en los IDs obtenidos
+        if ($vehiculosIds->isNotEmpty()) {
+            $vehiculos = Vehiculo::whereIn('id_vehiculo', $vehiculosIds)
+                ->orderBy('placa')
+                ->get();
+        } else {
+            // Si no tiene turnos asignados, mostrar todos los vehículos
+            $vehiculos = Vehiculo::orderBy('placa')->get();
+        }
         $tarifas = TarifaDestino::where('activa', true)
             ->orderBy('nombre_destino')
             ->get();
