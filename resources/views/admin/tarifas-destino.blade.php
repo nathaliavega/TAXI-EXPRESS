@@ -7,11 +7,11 @@
     <!-- Encabezado -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="h3 mb-0 text-gray-800">💰 Tarifas de Destino</h1>
+            <h1 class="h3 mb-0 fw-bold text-dark">💰 Tarifas de Destino</h1>
             <p class="text-muted mb-0">Administra las tarifas y destinos disponibles</p>
         </div>
-        <div>
-            <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary me-2">
+        <div class="d-flex gap-2">
+            <a href="{{ route('admin.dashboard') }}" class="btn btn-light border">
                 <i class="fas fa-arrow-left"></i> Volver
             </a>
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalNuevaTarifa">
@@ -38,78 +38,62 @@
     <!-- Estadísticas -->
     <div class="row g-3 mb-4">
         <div class="col-md-3">
-            <div class="card stat-card stat-primary shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="stat-icon bg-primary">
-                            <i class="fas fa-route"></i>
-                        </div>
-                        <div class="ms-3">
-                            <h6 class="text-uppercase text-muted mb-1 small">Total Destinos</h6>
-                            <h3 class="mb-0 fw-bold">{{ $tarifas->total() }}</h3>
-                        </div>
-                    </div>
+            <div class="stats-card blue-border">
+                <div class="stats-icon blue">
+                    <i class="fas fa-route"></i>
+                </div>
+                <div class="stats-content">
+                    <p class="stats-label">TOTAL DESTINOS</p>
+                    <h2 class="stats-value">{{ $tarifas->total() }}</h2>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card stat-card stat-success shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="stat-icon bg-success">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
-                        <div class="ms-3">
-                            <h6 class="text-uppercase text-muted mb-1 small">Tarifas Activas</h6>
-                            <h3 class="mb-0 fw-bold">{{ $tarifas->where('activa', true)->count() }}</h3>
-                        </div>
-                    </div>
+            <div class="stats-card green-border">
+                <div class="stats-icon green">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stats-content">
+                    <p class="stats-label">TARIFAS ACTIVAS</p>
+                    <h2 class="stats-value">{{ $tarifas->where('activa', true)->count() }}</h2>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card stat-card stat-warning shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="stat-icon bg-warning">
-                            <i class="fas fa-dollar-sign"></i>
-                        </div>
-                        <div class="ms-3">
-                            <h6 class="text-uppercase text-muted mb-1 small">Tarifa Promedio</h6>
-                            <h3 class="mb-0 fw-bold">${{ number_format($tarifas->avg('tarifa_base'), 0) }}</h3>
-                        </div>
-                    </div>
+            <div class="stats-card yellow-border">
+                <div class="stats-icon yellow">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="stats-content">
+                    <p class="stats-label">TARIFA PROMEDIO</p>
+                    <h2 class="stats-value">${{ number_format($tarifas->avg('tarifa_base'), 0) }}</h2>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card stat-card stat-info shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="stat-icon bg-info">
-                            <i class="fas fa-map-marked-alt"></i>
-                        </div>
-                        <div class="ms-3">
-                            <h6 class="text-uppercase text-muted mb-1 small">Ciudades</h6>
-                            <h3 class="mb-0 fw-bold">{{ $tarifas->unique('ciudad')->count() }}</h3>
-                        </div>
-                    </div>
+            <div class="stats-card cyan-border">
+                <div class="stats-icon cyan">
+                    <i class="fas fa-map-marked-alt"></i>
+                </div>
+                <div class="stats-content">
+                    <p class="stats-label">CIUDADES</p>
+                    <h2 class="stats-value">{{ $tarifas->unique('ciudad')->count() }}</h2>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Filtros -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-body py-3">
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
             <form method="GET" action="{{ route('admin.tarifas-destino') }}">
-                <div class="row g-3 align-items-end">
+                <div class="row g-3">
                     <div class="col-md-3">
-                        <label class="form-label small text-muted mb-1">Búsqueda</label>
+                        <label class="form-label text-muted small">Búsqueda</label>
                         <input type="text" name="buscar" class="form-control" placeholder="Buscar destino o ciudad..." value="{{ request('buscar') }}">
                     </div>
                     <div class="col-md-2">
-                        <label class="form-label small text-muted mb-1">Departamento</label>
+                        <label class="form-label text-muted small">Departamento</label>
                         <select name="departamento" class="form-select">
                             <option value="">Todos</option>
                             <option value="Santander" {{ request('departamento') == 'Santander' ? 'selected' : '' }}>Santander</option>
@@ -117,7 +101,7 @@
                         </select>
                     </div>
                     <div class="col-md-2">
-                        <label class="form-label small text-muted mb-1">Estado</label>
+                        <label class="form-label text-muted small">Estado</label>
                         <select name="activa" class="form-select">
                             <option value="">Todos</option>
                             <option value="1" {{ request('activa') === '1' ? 'selected' : '' }}>Activas</option>
@@ -125,14 +109,14 @@
                         </select>
                     </div>
                     <div class="col-md-2">
-                        <label class="form-label small text-muted mb-1">Tarifa Desde</label>
+                        <label class="form-label text-muted small">Tarifa Desde</label>
                         <input type="number" name="tarifa_min" class="form-control" placeholder="Min" value="{{ request('tarifa_min') }}">
                     </div>
                     <div class="col-md-2">
-                        <label class="form-label small text-muted mb-1">Tarifa Hasta</label>
+                        <label class="form-label text-muted small">Tarifa Hasta</label>
                         <input type="number" name="tarifa_max" class="form-control" placeholder="Max" value="{{ request('tarifa_max') }}">
                     </div>
-                    <div class="col-md-1">
+                    <div class="col-md-1 d-flex align-items-end">
                         <button type="submit" class="btn btn-primary w-100">
                             <i class="fas fa-search"></i>
                         </button>
@@ -143,77 +127,67 @@
     </div>
 
     <!-- Tabla de Tarifas -->
-    <div class="card shadow-sm">
-        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-            <h6 class="m-0 fw-bold text-primary">
-                <i class="fas fa-list me-2"></i>Lista de Tarifas y Destinos
-            </h6>
-            <span class="badge bg-primary">{{ $tarifas->total() }} registros</span>
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white border-0 py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h6 class="m-0 fw-bold text-primary">
+                    <i class="fas fa-list me-2"></i>Lista de Tarifas y Destinos
+                </h6>
+                <span class="badge bg-primary rounded-pill">{{ $tarifas->total() }} registros</span>
+            </div>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
+                    <thead>
                         <tr>
-                            <th class="px-4" style="width: 60px;">ID</th>
-                            <th>Destino</th>
-                            <th>Ciudad</th>
-                            <th>Departamento</th>
-                            <th class="text-end">Tarifa Base</th>
-                            <th>Vigencia</th>
-                            <th class="text-center" style="width: 100px;">Estado</th>
-                            <th class="text-center" style="width: 130px;">Acciones</th>
+                            <th class="px-4 text-muted small">ID</th>
+                            <th class="text-muted small">DESTINO</th>
+                            <th class="text-muted small">CIUDAD</th>
+                            <th class="text-muted small">DEPARTAMENTO</th>
+                            <th class="text-muted small text-end">TARIFA BASE</th>
+                            <th class="text-muted small">VIGENCIA</th>
+                            <th class="text-muted small text-center">ESTADO</th>
+                            <th class="text-muted small text-center">ACCIONES</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($tarifas as $tarifa)
                             <tr>
                                 <td class="px-4 text-muted">{{ $tarifa->id_tarifa }}</td>
-                                <td>
-                                    <strong>{{ $tarifa->nombre_destino }}</strong>
-                                </td>
-                                <td>
-                                    <i class="fas fa-map-marker-alt text-primary me-1"></i>
-                                    {{ $tarifa->ciudad }}
-                                </td>
+                                <td><strong class="text-dark">{{ $tarifa->nombre_destino }}</strong></td>
+                                <td>{{ $tarifa->ciudad }}</td>
                                 <td>{{ $tarifa->departamento }}</td>
                                 <td class="text-end">
                                     <strong class="text-success">${{ number_format($tarifa->tarifa_base, 0) }}</strong>
                                 </td>
                                 <td>
                                     <small class="text-muted">
-                                        <i class="fas fa-calendar-alt me-1"></i>
                                         {{ \Carbon\Carbon::parse($tarifa->fecha_vigencia_desde)->format('d/m/Y') }}
                                         @if($tarifa->fecha_vigencia_hasta)
                                             - {{ \Carbon\Carbon::parse($tarifa->fecha_vigencia_hasta)->format('d/m/Y') }}
-                                        @else
-                                            - <span class="text-success">Vigente</span>
                                         @endif
                                     </small>
                                 </td>
                                 <td class="text-center">
                                     @if($tarifa->activa)
-                                        <span class="badge bg-success-subtle text-success px-3 py-2">
-                                            <i class="fas fa-check-circle me-1"></i>Activa
-                                        </span>
+                                        <span class="badge-status active">Activa</span>
                                     @else
-                                        <span class="badge bg-secondary-subtle text-secondary px-3 py-2">
-                                            <i class="fas fa-times-circle me-1"></i>Inactiva
-                                        </span>
+                                        <span class="badge-status inactive">Inactiva</span>
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    <div class="btn-group" role="group">
-                                        <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#verTarifa{{ $tarifa->id_tarifa }}" title="Ver detalles">
+                                    <div class="action-buttons">
+                                        <button type="button" class="btn-action view" data-bs-toggle="modal" data-bs-target="#verTarifa{{ $tarifa->id_tarifa }}" title="Ver">
                                             <i class="fas fa-eye"></i>
                                         </button>
-                                        <button type="button" class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editarTarifa{{ $tarifa->id_tarifa }}" title="Editar">
+                                        <button type="button" class="btn-action edit" data-bs-toggle="modal" data-bs-target="#editarTarifa{{ $tarifa->id_tarifa }}" title="Editar">
                                             <i class="fas fa-edit"></i>
                                         </button>
                                         <form action="{{ route('admin.tarifas-destino', $tarifa->id_tarifa) }}" method="POST" class="d-inline">
                                             @csrf
                                             @method('PATCH')
-                                            <button type="submit" class="btn btn-sm btn-outline-{{ $tarifa->activa ? 'danger' : 'success' }}" title="{{ $tarifa->activa ? 'Desactivar' : 'Activar' }}">
+                                            <button type="submit" class="btn-action {{ $tarifa->activa ? 'delete' : 'activate' }}" title="{{ $tarifa->activa ? 'Desactivar' : 'Activar' }}">
                                                 <i class="fas fa-{{ $tarifa->activa ? 'ban' : 'check' }}"></i>
                                             </button>
                                         </form>
@@ -224,92 +198,57 @@
                             <!-- Modal Ver Tarifa -->
                             <div class="modal fade" id="verTarifa{{ $tarifa->id_tarifa }}" tabindex="-1">
                                 <div class="modal-dialog modal-lg modal-dialog-centered">
-                                    <div class="modal-content border-0 shadow">
-                                        <div class="modal-header bg-gradient-info text-white">
-                                            <h5 class="modal-title">
-                                                <i class="fas fa-tags me-2"></i>Detalle de Tarifa #{{ $tarifa->id_tarifa }}
+                                    <div class="modal-content border-0 shadow-lg">
+                                        <div class="modal-header border-0">
+                                            <h5 class="modal-title fw-bold">
+                                                <i class="fas fa-info-circle text-primary me-2"></i>Detalle de Tarifa #{{ $tarifa->id_tarifa }}
                                             </h5>
-                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                         </div>
                                         <div class="modal-body p-4">
-                                            <!-- Estado -->
-                                            <div class="alert {{ $tarifa->activa ? 'alert-success' : 'alert-secondary' }} mb-4">
-                                                <strong>Estado:</strong>
-                                                @if($tarifa->activa)
-                                                    <span class="badge bg-success ms-2">Tarifa Activa</span>
-                                                @else
-                                                    <span class="badge bg-secondary ms-2">Tarifa Inactiva</span>
-                                                @endif
-                                            </div>
-
-                                            <!-- Info Principal -->
-                                            <div class="row g-4 mb-4">
-                                                <div class="col-md-12">
-                                                    <div class="info-item">
-                                                        <label class="text-muted small text-uppercase">Nombre del Destino</label>
-                                                        <p class="mb-0 fw-bold fs-4">{{ $tarifa->nombre_destino }}</p>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="info-item">
-                                                        <label class="text-muted small text-uppercase">Ciudad</label>
-                                                        <p class="mb-0 fw-semibold">
-                                                            <i class="fas fa-map-marker-alt text-primary me-2"></i>
-                                                            {{ $tarifa->ciudad }}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="info-item">
-                                                        <label class="text-muted small text-uppercase">Departamento</label>
-                                                        <p class="mb-0 fw-semibold">{{ $tarifa->departamento }}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <hr class="my-4">
-
-                                            <!-- Información Tarifaria -->
-                                            <h6 class="text-primary mb-3"><i class="fas fa-dollar-sign me-2"></i>Información Tarifaria</h6>
-                                            <div class="row g-4 mb-4">
-                                                <div class="col-md-12">
-                                                    <div class="info-item text-center">
-                                                        <label class="text-muted small text-uppercase">Tarifa Base</label>
-                                                        <p class="mb-0 fw-bold text-success" style="font-size: 2rem;">${{ number_format($tarifa->tarifa_base, 0) }}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <hr class="my-4">
-
-                                            <!-- Vigencia -->
-                                            <h6 class="text-primary mb-3"><i class="fas fa-calendar-check me-2"></i>Vigencia</h6>
                                             <div class="row g-4">
-                                                <div class="col-md-6">
-                                                    <div class="info-item">
-                                                        <label class="text-muted small text-uppercase">Fecha Inicio</label>
-                                                        <p class="mb-0 fw-semibold">{{ \Carbon\Carbon::parse($tarifa->fecha_vigencia_desde)->format('d/m/Y') }}</p>
-                                                    </div>
+                                                <div class="col-12">
+                                                    @if($tarifa->activa)
+                                                        <span class="badge-status active large">Tarifa Activa</span>
+                                                    @else
+                                                        <span class="badge-status inactive large">Tarifa Inactiva</span>
+                                                    @endif
+                                                </div>
+                                                <div class="col-12">
+                                                    <label class="detail-label">Nombre del Destino</label>
+                                                    <p class="detail-value">{{ $tarifa->nombre_destino }}</p>
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <div class="info-item">
-                                                        <label class="text-muted small text-uppercase">Fecha Fin</label>
-                                                        <p class="mb-0 fw-semibold">
-                                                            @if($tarifa->fecha_vigencia_hasta)
-                                                                {{ \Carbon\Carbon::parse($tarifa->fecha_vigencia_hasta)->format('d/m/Y') }}
-                                                            @else
-                                                                <span class="text-success">Sin fecha límite (Vigente)</span>
-                                                            @endif
-                                                        </p>
-                                                    </div>
+                                                    <label class="detail-label">Ciudad</label>
+                                                    <p class="detail-value">{{ $tarifa->ciudad }}</p>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="detail-label">Departamento</label>
+                                                    <p class="detail-value">{{ $tarifa->departamento }}</p>
+                                                </div>
+                                                <div class="col-12">
+                                                    <label class="detail-label">Tarifa Base</label>
+                                                    <p class="detail-value text-success" style="font-size: 2rem;">${{ number_format($tarifa->tarifa_base, 0) }}</p>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="detail-label">Fecha Inicio</label>
+                                                    <p class="detail-value">{{ \Carbon\Carbon::parse($tarifa->fecha_vigencia_desde)->format('d/m/Y') }}</p>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="detail-label">Fecha Fin</label>
+                                                    <p class="detail-value">
+                                                        @if($tarifa->fecha_vigencia_hasta)
+                                                            {{ \Carbon\Carbon::parse($tarifa->fecha_vigencia_hasta)->format('d/m/Y') }}
+                                                        @else
+                                                            <span class="text-success">Sin fecha límite</span>
+                                                        @endif
+                                                    </p>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="modal-footer bg-light">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                                <i class="fas fa-times me-1"></i>Cerrar
-                                            </button>
-                                            <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editarTarifa{{ $tarifa->id_tarifa }}">
+                                        <div class="modal-footer border-0 bg-light">
+                                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cerrar</button>
+                                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#editarTarifa{{ $tarifa->id_tarifa }}">
                                                 <i class="fas fa-edit me-1"></i>Editar
                                             </button>
                                         </div>
@@ -320,13 +259,13 @@
                             <!-- Modal Editar Tarifa -->
                             <div class="modal fade" id="editarTarifa{{ $tarifa->id_tarifa }}" tabindex="-1">
                                 <div class="modal-dialog modal-dialog-centered">
-                                    <div class="modal-content border-0 shadow">
+                                    <div class="modal-content border-0 shadow-lg">
                                         <form action="{{ route('admin.tarifas-destino', $tarifa->id_tarifa) }}" method="POST">
                                             @csrf
                                             @method('PUT')
-                                            <div class="modal-header bg-warning">
-                                                <h5 class="modal-title">
-                                                    <i class="fas fa-edit me-2"></i>Editar Tarifa
+                                            <div class="modal-header border-0">
+                                                <h5 class="modal-title fw-bold">
+                                                    <i class="fas fa-edit text-primary me-2"></i>Editar Tarifa
                                                 </h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                             </div>
@@ -349,11 +288,11 @@
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-md-6 mb-3">
-                                                        <label class="form-label fw-semibold">Fecha Inicio Vigencia <span class="text-danger">*</span></label>
+                                                        <label class="form-label fw-semibold">Fecha Inicio <span class="text-danger">*</span></label>
                                                         <input type="date" name="fecha_vigencia_desde" class="form-control" value="{{ $tarifa->fecha_vigencia_desde }}" required>
                                                     </div>
                                                     <div class="col-md-6 mb-3">
-                                                        <label class="form-label fw-semibold">Fecha Fin Vigencia</label>
+                                                        <label class="form-label fw-semibold">Fecha Fin</label>
                                                         <input type="date" name="fecha_vigencia_hasta" class="form-control" value="{{ $tarifa->fecha_vigencia_hasta }}">
                                                     </div>
                                                 </div>
@@ -365,10 +304,10 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div class="modal-footer bg-light">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                                <button type="submit" class="btn btn-warning">
-                                                    <i class="fas fa-save me-1"></i>Actualizar
+                                            <div class="modal-footer border-0 bg-light">
+                                                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                                                <button type="submit" class="btn btn-primary">
+                                                    <i class="fas fa-save me-1"></i>Guardar Cambios
                                                 </button>
                                             </div>
                                         </form>
@@ -391,7 +330,7 @@
 
         <!-- Paginación -->
         @if($tarifas->hasPages())
-        <div class="card-footer bg-white py-3">
+        <div class="card-footer bg-white border-0 py-3">
             <div class="d-flex justify-content-center">
                 {{ $tarifas->links() }}
             </div>
@@ -403,14 +342,14 @@
 <!-- Modal Nueva Tarifa -->
 <div class="modal fade" id="modalNuevaTarifa" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
+        <div class="modal-content border-0 shadow-lg">
             <form action="{{ route('admin.tarifas-destino') }}" method="POST">
                 @csrf
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title">
-                        <i class="fas fa-plus-circle me-2"></i>Nueva Tarifa de Destino
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fas fa-plus-circle text-primary me-2"></i>Nueva Tarifa de Destino
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-4">
                     <div class="mb-3">
@@ -433,20 +372,20 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label fw-semibold">Fecha Inicio Vigencia <span class="text-danger">*</span></label>
+                            <label class="form-label fw-semibold">Fecha Inicio <span class="text-danger">*</span></label>
                             <input type="date" name="fecha_vigencia_desde" class="form-control" required>
                         </div>
                         <div class="col-md-6 mb-0">
-                            <label class="form-label fw-semibold">Fecha Fin Vigencia</label>
+                            <label class="form-label fw-semibold">Fecha Fin</label>
                             <input type="date" name="fecha_vigencia_hasta" class="form-control">
                             <small class="text-muted">Opcional</small>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer bg-light">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <div class="modal-footer border-0 bg-light">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-1"></i>Guardar
+                        <i class="fas fa-save me-1"></i>Guardar Tarifa
                     </button>
                 </div>
             </form>
@@ -455,103 +394,258 @@
 </div>
 
 <style>
-/* Tarjetas de estadísticas */
-.stat-card {
-    border: none;
-    border-radius: 10px;
-    transition: transform 0.2s ease;
+/* Estadísticas Cards */
+.stats-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
 }
-.stat-card:hover {
-    transform: translateY(-3px);
-}
-.stat-primary { border-left: 4px solid #0d6efd !important; }
-.stat-success { border-left: 4px solid #198754 !important; }
-.stat-info { border-left: 4px solid #0dcaf0 !important; }
-.stat-warning { border-left: 4px solid #ffc107 !important; }
 
-.stat-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 10px;
+.stats-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.stats-card.blue-border { border-left: 4px solid #2563eb; }
+.stats-card.green-border { border-left: 4px solid #16a34a; }
+.stats-card.yellow-border { border-left: 4px solid #eab308; }
+.stats-card.cyan-border { border-left: 4px solid #06b6d4; }
+
+.stats-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 1.5rem;
     color: white;
-    font-size: 1.3rem;
+    flex-shrink: 0;
+}
+
+.stats-icon.blue { background: #2563eb; }
+.stats-icon.green { background: #16a34a; }
+.stats-icon.yellow { background: #eab308; }
+.stats-icon.cyan { background: #06b6d4; }
+
+.stats-content {
+    flex: 1;
+}
+
+.stats-label {
+    margin: 0;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #6b7280;
+    letter-spacing: 0.5px;
+}
+
+.stats-value {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1f2937;
+    line-height: 1;
+}
+
+/* Card principal */
+.card {
+    border-radius: 12px;
+    overflow: hidden;
 }
 
 /* Tabla */
-.table > thead {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-}
-.table > thead th {
+.table thead tr th {
+    background: #f9fafb;
     font-weight: 600;
-    text-transform: uppercase;
     font-size: 0.75rem;
     letter-spacing: 0.5px;
-    color: #495057;
-    border-bottom: 2px solid #dee2e6;
-    padding: 1rem 0.75rem;
+    border-bottom: 2px solid #e5e7eb;
+    padding: 1rem;
 }
-.table > tbody > tr {
-    transition: background-color 0.15s ease;
+
+.table tbody tr {
+    border-bottom: 1px solid #f3f4f6;
+    transition: background-color 0.15s;
 }
-.table > tbody > tr:hover {
-    background-color: #f8f9fc;
+
+.table tbody tr:hover {
+    background-color: #f9fafb;
 }
-.table > tbody > tr > td {
-    padding: 1rem 0.75rem;
+
+.table tbody tr td {
+    padding: 1rem;
     vertical-align: middle;
 }
 
-/* Badges de estado mejorados */
-.bg-success-subtle {
-    background-color: #d1e7dd !important;
+/* Badge de estado */
+.badge-status {
+    display: inline-block;
+    padding: 0.375rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
-.bg-secondary-subtle {
-    background-color: #e2e3e5 !important;
+
+.badge-status.active {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.badge-status.inactive {
+    background: #e5e7eb;
+    color: #6b7280;
+}
+
+.badge-status.large {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
 }
 
 /* Botones de acción */
-.btn-group .btn {
-    padding: 0.4rem 0.6rem;
-    border-radius: 5px !important;
-    margin: 0 2px;
+.action-buttons {
+    display: flex;
+    gap: 0.25rem;
+    justify-content: center;
 }
 
-/* Modal headers con gradiente */
-.bg-gradient-info {
-    background: linear-gradient(135deg, #0dcaf0 0%, #0aa2c0 100%);
+.btn-action {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: none;
+    background: #f3f4f6;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/* Info items en modal */
-.info-item {
-    background: #f8f9fa;
-    padding: 1rem;
-    border-radius: 8px;
-    height: 100%;
+.btn-action:hover {
+    transform: translateY(-1px);
 }
-.info-item label {
-    font-size: 0.7rem;
+
+.btn-action.view:hover {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+.btn-action.edit:hover {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.btn-action.delete:hover {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.btn-action.activate:hover {
+    background: #d1fae5;
+    color: #16a34a;
+}
+
+/* Modales */
+.modal-content {
+    border-radius: 12px;
+}
+
+.modal-header {
+    padding: 1.5rem;
+}
+
+.modal-body {
+    padding: 2rem;
+}
+
+.modal-footer {
+    padding: 1rem 1.5rem;
+}
+
+/* Detalles en modal */
+.detail-label {
+    font-size: 0.75rem;
     font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin-bottom: 0.25rem;
-    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.detail-value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0;
 }
 
 /* Formularios */
-.form-control:focus, .form-select:focus {
-    border-color: #86b7fe;
-    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+.form-control, .form-select {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 0.625rem 0.875rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-/* Cards */
-.card {
-    border: none;
-    border-radius: 10px;
+.form-control:focus, .form-select:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
-.card-header {
-    border-bottom: 1px solid #eee;
+
+/* Botones */
+.btn {
+    border-radius: 8px;
+    padding: 0.625rem 1.25rem;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: #2563eb;
+    border-color: #2563eb;
+}
+
+.btn-primary:hover {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+.btn-light {
+    background: #f3f4f6;
+    border-color: #e5e7eb;
+    color: #6b7280;
+}
+
+.btn-light:hover {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .stats-card {
+        padding: 1rem;
+    }
+    
+    .stats-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.25rem;
+    }
+    
+    .stats-value {
+        font-size: 1.5rem;
+    }
 }
 </style>
 @endsection
