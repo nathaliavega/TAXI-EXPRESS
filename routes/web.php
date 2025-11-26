@@ -46,7 +46,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/propietarios', [AdminController::class, 'propietarios'])->name('propietarios');
         Route::get('/alertas', [AdminController::class, 'alertas'])->name('alertas');
         Route::get('/solicitudes-cambio-ruta', [AdminController::class, 'solicitudesCambioRuta'])->name('solicitudes-cambio-ruta');
-        //Route::get('/tarifas-destino', [AdminController::class, 'tarifasDestino'])->name('tarifas-destino');
+        Route::get('/tarifas-destino', [AdminController::class, 'tarifasDestino'])->name('tarifas-destino');
         Route::get('/mantenimiento-general', [AdminController::class, 'mantenimientoGeneral'])->name('mantenimiento-general');
         Route::patch('/solicitudes/aprobar/{id}', [AdminController::class, 'aprobarSolicitud'])
             ->name('solicitudes.aprobar');
