@@ -312,7 +312,7 @@
             </div>
 
             <div class="section">
-                <h2>💰 Tarifas Destinos <a href="{{ route('admin.tarifas-destino') }}">Ver todas →</a></h2>
+                <h2>💰 Tarifas Destinos <a href="{{ url('admin/tarifas-destino') }}">Ver todas →</a></h2>
                 <table>
                     <thead><tr><th>Destino</th><th>Ciudad</th><th>Tarifa</th><th>Estado</th></tr></thead>
                     <tbody>
