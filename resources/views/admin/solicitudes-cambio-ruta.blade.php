@@ -7,18 +7,18 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-light">
-<div class="container-fluid px-4 py-4">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="mb-1">🚕 Solicitudes de Cambio de Ruta</h2>
-            <p class="text-muted mb-0">Gestiona las solicitudes de cambio de ruta de los conductores</p>
-        </div>
-        <button onclick="window.history.back()" class="btn btn-outline-secondary">
-            <i class="fas fa-arrow-left me-2"></i>Volver
+<body>
+<!-- Header con gradiente -->
+<div class="bg-gradient-header text-white py-3 px-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <h1 class="mb-0 fs-3 fw-bold">Gestión de Solicitudes de Cambio de Ruta</h1>
+        <button onclick="window.history.back()" class="btn btn-light">
+            <i class="fas fa-arrow-left me-2"></i>Volver al Dashboard
         </button>
     </div>
+</div>
+
+<div class="container-fluid px-4 py-4">
 
     <!-- Mensajes de éxito/error -->
     @if(session('success'))
@@ -35,67 +35,14 @@
         </div>
     @endif
 
-    <!-- Estadísticas -->
-    <div class="row mb-4">
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <div class="bg-primary bg-opacity-10 rounded-3 p-3">
-                                <i class="fas fa-list-alt fa-2x text-primary"></i>
-                            </div>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="text-muted mb-1">Total Solicitudes</h6>
-                            <h3 class="mb-0">{{ $solicitudes->total() }}</h3>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <div class="bg-warning bg-opacity-10 rounded-3 p-3">
-                                <i class="fas fa-clock fa-2x text-warning"></i>
-                            </div>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="text-muted mb-1">Pendientes</h6>
-                            <h3 class="mb-0">{{ $solicitudes->where('autorizado_por', null)->count() }}</h3>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <div class="bg-success bg-opacity-10 rounded-3 p-3">
-                                <i class="fas fa-check-circle fa-2x text-success"></i>
-                            </div>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="text-muted mb-1">Procesadas</h6>
-                            <h3 class="mb-0">{{ $solicitudes->where('autorizado_por', '!=', null)->count() }}</h3>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+
 
     <!-- Tabla de Solicitudes -->
     <div class="card border-0 shadow-sm">
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="bg-light">
+                    <thead style="background-color: #2c3e50; color: white;">
                         <tr>
                             <th class="px-4 py-3">Fecha</th>
                             <th class="py-3">Conductor</th>
@@ -186,11 +133,6 @@
                 </table>
             </div>
         </div>
-        @if($solicitudes->hasPages())
-            <div class="card-footer bg-white border-top">
-                {{ $solicitudes->links() }}
-            </div>
-        @endif
     </div>
 </div>
 
@@ -225,6 +167,15 @@ function rechazarSolicitud(id) {
 </script>
 
 <style>
+body {
+    background-color: #f5f5f5;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.bg-gradient-header {
+    background: linear-gradient(135deg, #e74c3c 0%, #f39c12 100%);
+}
+
 .table > tbody > tr:hover {
     background-color: #f8f9fa;
 }
@@ -236,6 +187,14 @@ function rechazarSolicitud(id) {
 .badge {
     font-weight: 500;
     padding: 0.5em 0.75em;
+}
+
+.card {
+    border-radius: 10px;
+}
+
+thead {
+    border-radius: 10px 10px 0 0;
 }
 </style>
 </body>
