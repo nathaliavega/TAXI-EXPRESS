@@ -4,7 +4,8 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\OperadoraController;
 use App\Http\Controllers\ConductorController;
-use App\Http\Controllers\TarifaDestinoController; // ⬅️ AGREGAR ESTA LÍNEA
+use App\Http\Controllers\TarifaDestinoController;
+use App\Http\Controllers\ControlTurnosController; 
 use Illuminate\Support\Facades\Route;
 
 // RUTAS PÚBLICAS
@@ -75,9 +76,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/control-turnos', [OperadoraController::class, 'controlTurnos'])->name('control-turnos');
         Route::get('/turnos-obligatorios', [OperadoraController::class, 'turnosObligatorios'])->name('turnos-obligatorios');
         Route::get('/vehiculos', [OperadoraController::class, 'vehiculos'])->name('vehiculos');
-        Route::get('/control-turnos', [App\Http\Controllers\Operadora\ControlTurnosController::class, 'index'])->name('control-turnos');
-        Route::put('/control-turnos/{id}', [App\Http\Controllers\Operadora\ControlTurnosController::class, 'update'])->name('control-turnos.update');
-        Route::delete('/control-turnos/{id}', [App\Http\Controllers\Operadora\ControlTurnosController::class, 'destroy'])->name('control-turnos.destroy');
+        Route::get('/control-turnos', [ControlTurnosController::class, 'index'])->name('control-turnos');
+        Route::put('/control-turnos/{id}', [ControlTurnosController::class, 'update'])->name('control-turnos.update');
+        Route::delete('/control-turnos/{id}', [ControlTurnosController::class, 'destroy'])->name('control-turnos.destroy');
         
     });
     
