@@ -9,7 +9,7 @@ class TarifaDestinoController extends Controller
 {
     public function index()
     {
-        $tarifas = TarifasDestino::all();
+        $tarifas = TarifaDestino::all();
         return view('admin.tarifas-destino', compact('tarifas'));
     }
 
@@ -63,7 +63,7 @@ class TarifaDestinoController extends Controller
         $tarifa = TarifaDestino::findOrFail($id);
         $tarifa->delete();
 
-        return redirect()->route('admin.tarifas-destino')
+        return redirect()->route('admin.tarifas-destino.')
             ->with('success', 'Tarifa eliminada exitosamente');
     }
 }
