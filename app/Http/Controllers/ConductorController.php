@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\TurnoObligatorio;
 use App\Models\Alerta;
 use App\Models\Conductor;
+use App\Models\Vehiculo;
 use App\Models\MantenimientoGeneral;
 use App\Models\SolicitudCambioRuta;
 use App\Models\Propietario;
@@ -161,7 +162,17 @@ class ConductorController extends Controller
         ->orderBy('fecha_solicitud', 'desc')
         ->paginate(20);
 
-        return view('conductor.solicitudes-cambio-ruta', compact('solicitudes'));
+         // Solo los vehículos asignados a este conductor
+        $vehiculos = Vehiculo::where('activo', true)
+            ->where('id_conductor', $conductor->id_conductor)
+            ->orderBy('placa')
+            ->get();
+        
+        $tarifas = TarifaDestino::where('activa', true)
+            ->orderBy('nombre_destino')
+            ->get();
+
+        return view('conductor.solicitudes-cambio-ruta', compact('solicitudes', 'conductor', 'vehiculos', 'tarifas'));
     }
 
     /**
