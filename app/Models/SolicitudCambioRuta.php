@@ -43,7 +43,7 @@ class SolicitudCambioRuta extends Model
     }
      public function autorizadoPor()
     {
-        return $this->belongsTo(Usuario::class, 'autorizado_por', 'id_usuario');
+        return $this->belongsTo(User::class, 'autorizado_por', 'id_usuario');
         // O si usas User en lugar de Usuario:
         // return $this->belongsTo(User::class, 'autorizado_por', 'id');
     }
