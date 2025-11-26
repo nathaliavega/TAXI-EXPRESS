@@ -9,8 +9,8 @@ class TarifaDestinoController extends Controller
 {
     public function index()
     {
-        $tarifas = TarifaDestino::all();
-        return view('admin.tarifas-destino.index', compact('tarifas'));
+        $tarifas = TarifasDestino::all();
+        return view('admin.tarifas-destino', compact('tarifas'));
     }
 
     public function store(Request $request)
@@ -36,7 +36,7 @@ class TarifaDestinoController extends Controller
             'estado' => 'Activa', // Por defecto activa
         ]);
 
-        return redirect()->route('tarifas-destino.index')
+        return redirect()->route('admin.tarifas-destino')
             ->with('success', 'Tarifa creada exitosamente');
     }
 
@@ -54,7 +54,7 @@ class TarifaDestinoController extends Controller
         $tarifa = TarifaDestino::findOrFail($id);
         $tarifa->update($validated);
 
-        return redirect()->route('tarifas-destino.index')
+        return redirect()->route('admin.tarifas-destino')
             ->with('success', 'Tarifa actualizada exitosamente');
     }
 
@@ -63,7 +63,7 @@ class TarifaDestinoController extends Controller
         $tarifa = TarifaDestino::findOrFail($id);
         $tarifa->delete();
 
-        return redirect()->route('tarifas-destino.index')
+        return redirect()->route('admin.tarifas-destino')
             ->with('success', 'Tarifa eliminada exitosamente');
     }
 }
