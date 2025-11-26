@@ -181,6 +181,7 @@ class ConductorController extends Controller
         return view('conductor.solicitudes-cambio-ruta', compact('solicitudes', 'conductor', 'vehiculos', 'tarifas'));
     }
 
+
     /**
      * Lista de propietarios
      */
@@ -205,4 +206,38 @@ class ConductorController extends Controller
 
         return view('conductor.tarifas', compact('tarifas'));
     }
+    public function storeSolicitudCambioRuta(Request $request)
+{
+    $conductor = $this->getConductorAutenticado();
+
+    if (!$conductor) {
+        return redirect()->route('conductor.dashboard')
+            ->with('error', 'No se encontró información del conductor');
+    }
+
+    // Validar los datos del formulario
+    $validated = $request->validate([
+        'id_vehiculo' => 'required|exists:vehiculos,id_vehiculo',
+        'id_tarifa_destino' => 'required|exists:tarifas_destinos,id_tarifa',
+        'fecha_viaje_programada' => 'required|date|after:now',
+        'nombre_contratante' => 'required|string|max:200',
+        'documento_contratante' => 'required|string|max:50',
+        'telefono_contratante' => 'required|string|max:20',
+        'direccion_origen' => 'required|string',
+        'direccion_destino' => 'required|string',
+        'numero_pasajeros' => 'nullable|integer|min:1',
+        'tarifa_cobrada' => 'required|numeric|min:0',
+    ]);
+
+    // Agregar el ID del conductor autenticado
+    $validated['id_conductor'] = $conductor->id_conductor;
+    $validated['numero_pasajeros'] = $validated['numero_pasajeros'] ?? 1;
+
+    // Crear la solicitud
+    SolicitudCambioRuta::create($validated);
+
+    return redirect()->route('conductor.solicitudes-cambio-ruta')
+        ->with('success', 'Solicitud de cambio de ruta creada exitosamente. Está pendiente de autorización.');
+}
+
 }
