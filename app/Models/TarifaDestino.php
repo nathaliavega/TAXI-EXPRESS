@@ -11,6 +11,8 @@ class TarifaDestino extends Model
     
     // Especifica la clave primaria correcta
     protected $primaryKey = 'id_tarifa';
+
+    public $timestamps = false;
     
     // Los campos que se pueden llenar
     protected $fillable = [
@@ -25,9 +27,8 @@ class TarifaDestino extends Model
 
     // Convertir automáticamente estos campos
     protected $casts = [
-        'fecha_vigencia_desde' => 'date',
-        'fecha_vigencia_hasta' => 'date',
         'tarifa_base' => 'decimal:2',
-        'activa' => 'boolean'
+        'fecha_inicio' => 'date',
+        'fecha_fin' => 'date',
     ];
 }
