@@ -59,6 +59,14 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/tarifas-destino/{id}', [TarifaDestinoController::class, 'update'])->name('tarifas-destino.update');
         Route::delete('/tarifas-destino/{id}', [TarifaDestinoController::class, 'destroy'])->name('tarifas-destino.destroy');
         
+        Route::get('/fix-sequence', function() {
+    try {
+        DB::statement("SELECT setval('tarifas_destinos_id_tarifa_seq', (SELECT MAX(id_tarifa) FROM tarifas_destinos))");
+        return "Secuencia arreglada correctamente";
+    } catch (\Exception $e) {
+        return "Error: " . $e->getMessage();
+    }
+});
     });
     
     // Operadora

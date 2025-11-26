@@ -11,6 +11,11 @@ class TarifaDestino extends Model
     
     // Especifica la clave primaria correcta
     protected $primaryKey = 'id_tarifa';
+      // ✅ IMPORTANTE: Indicar que es autoincremental
+    public $incrementing = true;
+    
+    // ✅ Indicar el tipo de la clave primaria
+    protected $keyType = 'int';
 
     public $timestamps = false;
     
