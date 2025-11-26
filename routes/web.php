@@ -48,10 +48,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/solicitudes-cambio-ruta', [AdminController::class, 'solicitudesCambioRuta'])->name('solicitudes-cambio-ruta');
         Route::get('/tarifas-destino', [AdminController::class, 'tarifasDestino'])->name('tarifas-destino');
         Route::get('/mantenimiento-general', [AdminController::class, 'mantenimientoGeneral'])->name('mantenimiento-general');
-        Route::patch('/admin/solicitudes/aprobar/{id}', [AdminController::class, 'aprobarSolicitud'])
-            ->name('admin.solicitudes.aprobar');
-        Route::patch('/admin/solicitudes/rechazar/{id}', [AdminController::class, 'rechazarSolicitud'])
-            ->name('admin.solicitudes.rechazar');
+        Route::patch('/solicitudes/aprobar/{id}', [AdminController::class, 'aprobarSolicitud'])
+            ->name('solicitudes.aprobar');
+        Route::patch('/solicitudes/rechazar/{id}', [AdminController::class, 'rechazarSolicitud'])
+            ->name('solicitudes.rechazar');
     });
     
     // Operadora
