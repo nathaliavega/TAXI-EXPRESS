@@ -294,7 +294,7 @@
                 <table class="table table-hover mb-0">
                     <thead>
                         <tr>
-                            <th>ID</th>
+                           
                             <th>Destino</th>
                             <th>Ciudad</th>
                             <th>Departamento</th>
