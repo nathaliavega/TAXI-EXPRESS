@@ -54,10 +54,10 @@ Route::middleware(['auth'])->group(function () {
             ->name('solicitudes.rechazar');
         
         // ⬇️ TARIFAS DESTINO - SOLO ESTAS DOS RUTAS
-        Route::get('tarifas-destino', [TarifaDestinoController::class, 'index'])->name('admin.tarifas-destino');
-        Route::post('tarifas-destino', [TarifaDestinoController::class, 'store'])->name('admin.tarifas-destino.store');
-        Route::put('tarifas-destino/{id}', [TarifaDestinoController::class, 'update'])->name('admin.tarifas-destino.update');
-        Route::delete('tarifas-destino/{id}', [TarifaDestinoController::class, 'destroy'])->name('admin.tarifas-destino.destroy');
+        Route::get('/tarifas-destino', [TarifaDestinoController::class, 'index'])->name('admin.tarifas-destino');
+        Route::post('/tarifas-destino', [TarifaDestinoController::class, 'store'])->name('admin.tarifas-destino.store');
+        Route::put('/tarifas-destino/{id}', [TarifaDestinoController::class, 'update'])->name('admin.tarifas-destino.update');
+        Route::delete('/tarifas-destino/{id}', [TarifaDestinoController::class, 'destroy'])->name('admin.tarifas-destino.destroy');
         
     });
     
