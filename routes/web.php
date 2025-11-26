@@ -48,16 +48,11 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/solicitudes-cambio-ruta', [AdminController::class, 'solicitudesCambioRuta'])->name('solicitudes-cambio-ruta');
         Route::get('/tarifas-destino', [AdminController::class, 'tarifasDestino'])->name('tarifas-destino');
         Route::get('/mantenimiento-general', [AdminController::class, 'mantenimientoGeneral'])->name('mantenimiento-general');
-        Route::patch('/admin/solicitudes/aprobar/{id}', [AdminController::class, 'aprobarSolicitud']);
-        // Dentro del grupo de rutas de admin, agregar:
         Route::patch('/admin/solicitudes/aprobar/{id}', [AdminController::class, 'aprobarSolicitud'])
-            ->name('admin.solicitudes.aprobar')
-            ->middleware(['auth', 'checkRole:admin']);
-
+            ->name('admin.solicitudes.aprobar');
         Route::patch('/admin/solicitudes/rechazar/{id}', [AdminController::class, 'rechazarSolicitud'])
-            ->name('admin.solicitudes.rechazar')
-            ->middleware(['auth', 'checkRole:admin']);
-        });
+            ->name('admin.solicitudes.rechazar');
+    });
     
     // Operadora
     Route::middleware(['checkRole:operadora'])->prefix('operadora')->name('operadora.')->group(function () {
