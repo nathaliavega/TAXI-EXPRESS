@@ -262,7 +262,7 @@
             <div class="col-md-3">
                 <div class="stat-box">
                     <div class="stat-label">Total Destinos</div>
-                    <h2 class="stat-number">{{ $tarifas->total() }}</h2>
+                    <h2 class="stat-number">{{ $tarifas->count() }}</h2>
                 </div>
             </div>
             <div class="col-md-3">
@@ -289,14 +289,14 @@
         <div class="table-box">
             <div class="table-header d-flex justify-content-between align-items-center">
                 <h6 class="mb-0 fw-bold">Lista de Tarifas</h6>
-                <span class="badge bg-secondary">{{ $tarifas->total() }} registros</span>
+                <span class="badge bg-secondary">{{ $tarifas->count() }} registros</span>
             </div>
             
             <div class="table-responsive">
                 <table class="table table-hover mb-0">
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            
                             <th>Destino</th>
                             <th>Ciudad</th>
                             <th>Departamento</th>
@@ -309,7 +309,7 @@
                     <tbody>
                         @forelse($tarifas as $tarifa)
                             <tr>
-                                <td>{{ $tarifa->id }}</td>
+                                
                                 <td><strong>{{ $tarifa->nombre_destino }}</strong></td>
                                 <td>{{ $tarifa->ciudad }}</td>
                                 <td>{{ $tarifa->departamento }}</td>
@@ -477,12 +477,8 @@
                 </table>
             </div>
 
-            <!-- Paginación -->
-            @if($tarifas->hasPages())
-                <div class="p-3">
-                    {{ $tarifas->links() }}
-                </div>
-            @endif
+            
+            
         </div>
     </div>
 
