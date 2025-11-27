@@ -47,7 +47,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/alertas', [AdminController::class, 'alertas'])->name('alertas');
         Route::get('/solicitudes-cambio-ruta', [AdminController::class, 'solicitudesCambioRuta'])->name('solicitudes-cambio-ruta');
         Route::get('/mantenimiento-general', [AdminController::class, 'mantenimientoGeneral'])->name('mantenimiento-general');
-        
+        Route::post('/mantenimiento-general', [AdminController::class, 'storeMantenimiento'])->name('mantenimiento-general.store');
+        Route::put('/mantenimiento-general/{id}', [AdminController::class, 'updateMantenimiento'])->name('mantenimiento-general.update');
+        Route::delete('/mantenimiento-general/{id}', [AdminController::class, 'destroyMantenimiento'])->name('mantenimiento-general.destroy');
         // Solicitudes - aprobar/rechazar
         Route::patch('/solicitudes/aprobar/{id}', [AdminController::class, 'aprobarSolicitud'])
             ->name('solicitudes.aprobar');
