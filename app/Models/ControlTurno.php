@@ -8,7 +8,7 @@ class ControlTurno extends Model
 {
     protected $table = 'control_turnos';
     protected $primaryKey = 'id_control';
-    public $timestamps = false;
+    public $timestamps = true;
 
     protected $fillable = [
         'id_turno',
@@ -19,7 +19,7 @@ class ControlTurno extends Model
         'cruza_medianoche',
         'hora_llamado',
         'respondio',
-        'en_servicio'
+        'en_servicio',
     ];
 
     protected $casts = [
@@ -35,6 +35,6 @@ class ControlTurno extends Model
 
     public function operadora()
     {
-        return $this->belongsTo(User::class, 'id_operadora', 'id_usuario');
+        return $this->belongsTo(Usuario::class, 'id_operadora', 'id_usuario');
     }
 }

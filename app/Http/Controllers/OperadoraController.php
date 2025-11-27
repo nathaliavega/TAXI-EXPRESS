@@ -68,25 +68,33 @@ class OperadoraController extends Controller
             // Encontrar el control de turno usando la primary key correcta
             $control = ControlTurno::where('id_control', $id)->firstOrFail();
             
-            // Actualizar el turno asociado si cambió el vehículo o conductor
+            // Verificar si cambió el vehículo o conductor
             $turno = $control->turno;
             if ($turno->id_vehiculo != $validated['vehiculo_id'] || 
                 $turno->id_conductor != $validated['conductor_id']) {
                 
-                // Buscar o crear el turno con el nuevo vehículo/conductor
-                $turno = TurnoObligatorio::firstOrCreate(
-                    [
-                        'id_vehiculo' => $validated['vehiculo_id'],
-                        'id_conductor' => $validated['conductor_id'],
-                        'fecha_turno' => Carbon::today()
-                    ],
-                    [
-                        'estado' => 'activo'
-                    ]
-                );
+                // Buscar un turno existente con el nuevo vehículo/conductor
+                $nuevoTurno = TurnoObligatorio::where('id_vehiculo', $validated['vehiculo_id'])
+                    ->where('id_conductor', $validated['conductor_id'])
+                    ->where('fecha_turno', Carbon::today())
+                    ->first();
                 
-                $control->id_turno = $turno->id_turno;
+                if ($nuevoTurno) {
+                    // Si existe, usar ese turno
+                    $control->id_turno = $nuevoTurno->id_turno;
+                } else {
+                    // Si no existe, mantener el turno actual y solo actualizar sus datos
+                    $turno->id_vehiculo = $validated['vehiculo_id'];
+                    $turno->id_conductor = $validated['conductor_id'];
+                    $turno->save();
+                }
             }
+
+            // Determinar si el turno cruza medianoche
+            // Comparar las horas: si hora_fin < hora_inicio, cruza medianoche
+            $horaInicio = strtotime($validated['hora_inicio']);
+            $horaFin = strtotime($validated['hora_fin']);
+            $cruzaMedianoche = $horaFin < $horaInicio;
 
             // Actualizar el control
             $control->nombre_franja = $validated['nombre_franja'];
@@ -95,6 +103,8 @@ class OperadoraController extends Controller
             $control->hora_llamado = $validated['hora_llamado'];
             $control->respondio = $validated['respondio'];
             $control->en_servicio = $validated['en_servicio'];
+            $control->cruza_medianoche = $cruzaMedianoche;
+            // id_operadora no se modifica, mantiene la operadora original
             $control->save();
 
             DB::commit();
