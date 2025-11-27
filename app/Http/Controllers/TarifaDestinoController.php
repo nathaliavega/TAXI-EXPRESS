@@ -23,6 +23,7 @@ class TarifaDestinoController extends Controller
             'tarifa_base' => 'required|numeric|min:0',
             'fecha_inicio' => 'required|date',
             'fecha_fin' => 'nullable|date|after_or_equal:fecha_inicio',
+            
         ]);
 
         // Crear la tarifa
@@ -33,7 +34,7 @@ class TarifaDestinoController extends Controller
             'tarifa_base' => $validated['tarifa_base'],
             'fecha_inicio' => $validated['fecha_inicio'],
             'fecha_fin' => $validated['fecha_fin'],
-            'estado' => 'Activa', // Por defecto activa
+            'estado' => 'nullable|in:Activa,Inactiva',
         ]);
 
         return redirect()->route('admin.tarifas-destino')
@@ -49,6 +50,7 @@ class TarifaDestinoController extends Controller
             'tarifa_base' => 'required|numeric|min:0',
             'fecha_inicio' => 'required|date',
             'fecha_fin' => 'nullable|date|after_or_equal:fecha_inicio',
+            'estado' => 'required|in:Activa,Inactiva',
         ]);
 
         $tarifa = TarifaDestino::findOrFail($id);

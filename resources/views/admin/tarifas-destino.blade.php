@@ -542,6 +542,13 @@
                                 <label class="form-label">Fecha Fin</label>
                                 <input type="date" name="fecha_fin" class="form-control" value="{{ old('fecha_fin') }}">
                             </div>
+                            <div class="mb-0">
+                            <label class="form-label">Estado</label>
+                            <select name="estado" class="form-select">
+                                <option value="Activa" {{ $tarifa->estado == 'Activa' ? 'selected' : '' }}>Activa</option>
+                                <option value="Inactiva" {{ $tarifa->estado == 'Inactiva' ? 'selected' : '' }}>Inactiva</option>
+                            </select>
+                        </div>
                         </div>
                     </div>
                     <div class="modal-footer">
