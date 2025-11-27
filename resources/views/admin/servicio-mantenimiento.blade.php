@@ -109,10 +109,7 @@
 <body>
     <div class="navbar">
         <h1>🔧 Servicios de Mantenimiento - Taxi Express</h1>
-        <form action="{{ route('logout') }}" method="POST" style="display: inline;">
-            @csrf
-            <button type="submit" class="btn-logout">Cerrar Sesión</button>
-        </form>
+        
     </div>
 
     <div class="container">
@@ -125,7 +122,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        
                         <th>Vehículo</th>
                         <th>Tipo Mantenimiento</th>
                         <th>Fecha</th>
@@ -137,7 +134,7 @@
                 <tbody>
                     @foreach($servicios as $servicio)
                         <tr>
-                            <td><strong>#{{ $servicio->id_mantenimiento }}</strong></td>
+                            
                             <td>
                                 <strong>{{ $servicio->vehiculo->placa ?? 'N/A' }}</strong><br>
                                 <small>{{ $servicio->vehiculo->marca ?? '' }} {{ $servicio->vehiculo->modelo ?? '' }}</small>

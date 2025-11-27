@@ -49,15 +49,6 @@
             margin: 0;
         }
 
-        /* Filtros */
-        .filters-box {
-            background: white;
-            padding: 1.25rem;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 1.5rem;
-        }
-
         /* Tabla */
         .table-box {
             background: white;
@@ -92,6 +83,15 @@
         }
 
         /* Badges simples */
+        .badge-price {
+            padding: 0.35rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: 700;
+            background: #d1fae5;
+            color: #065f46;
+        }
+
         .status-badge {
             padding: 0.25rem 0.75rem;
             border-radius: 4px;
@@ -311,7 +311,9 @@
                                 <td><strong>{{ $tarifa->nombre_destino }}</strong></td>
                                 <td>{{ $tarifa->ciudad }}</td>
                                 <td>{{ $tarifa->departamento }}</td>
-                                <td class="text-end"><strong class="text-success">${{ number_format($tarifa->tarifa_base, 0) }}</strong></td>
+                                <td class="text-end">
+                                    <span class="badge-price">${{ number_format($tarifa->tarifa_base, 0) }}</span>
+                                </td>
                                 <td>
                                     <small class="text-muted">
                                         {{ \Carbon\Carbon::parse($tarifa->fecha_inicio)->format('d/m/Y') }}
@@ -376,7 +378,9 @@
                                             </div>
                                             <div class="detail-row">
                                                 <div class="detail-label">Tarifa Base</div>
-                                                <div class="detail-value text-success" style="font-size: 1.5rem;">${{ number_format($tarifa->tarifa_base, 0) }}</div>
+                                                <div class="detail-value">
+                                                    <span class="badge-price" style="font-size: 1.5rem; padding: 0.5rem 1rem;">${{ number_format($tarifa->tarifa_base, 0) }}</span>
+                                                </div>
                                             </div>
                                             <div class="row">
                                                 <div class="col-6">
