@@ -169,8 +169,7 @@ public function rechazarSolicitud($id)
 
     public function mantenimientoGeneral()
     {
-       $mantenimientos = MantenimientoGeneral::with('vehiculo')
-        ->orderBy('fecha_programada', 'desc')
+       $mantenimientos = MantenimientoGeneral::orderBy('fecha_programada', 'desc')
         ->paginate(20);
 
     // Agregar esta línea para obtener los vehículos
