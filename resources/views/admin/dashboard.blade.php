@@ -80,6 +80,8 @@
         .stat-card.success .number { color: #38a169; }
         .stat-card.warning { border-left-color: #dd6b20; }
         .stat-card.warning .number { color: #dd6b20; }
+        .stat-card.purple { border-left-color: #805ad5; }
+        .stat-card.purple .number { color: #805ad5; }
         
         .content-grid {
             display: grid;
@@ -218,7 +220,7 @@
             <a href="{{ route('admin.alertas') }}">⚠️ Alertas</a>
             <a href="{{ route('admin.solicitudes-cambio-ruta') }}">📝 Control de Solicitudes</a>
             <a href="{{ route('admin.tarifas-destino') }}">💰 Tarifas</a>
-            <a href="{{ route('admin.mantenimiento-general') }}">🔧 Mantenimientos</a>
+            <a href="{{ route('admin.servicio-mantenimiento') }}">🔧 Mantenimientos</a>
         </div>
 
         <div class="stats-grid">
@@ -233,6 +235,10 @@
             <div class="stat-card warning">
                 <h3>📅 Turnos Hoy</h3>
                 <div class="number">{{ $turnosHoy ?? 0 }}</div>
+            </div>
+            <div class="stat-card purple">
+                <h3>🔧 Servicios Mantenimiento</h3>
+                <div class="number">{{ $serviciosMantenimiento ?? 0 }}</div>
             </div>
             <div class="stat-card alertas">
                 <h3>⚠️ Alertas Pendientes</h3>
@@ -256,6 +262,25 @@
                     </div>
                 @empty
                     <div class="empty-state"><div class="icon">✅</div><p>No hay alertas pendientes</p></div>
+                @endforelse
+            </div>
+
+            <div class="section">
+                <h2>🔧 Mantenimientos Recientes <a href="{{ route('admin.servicio-mantenimiento') }}">Ver todos →</a></h2>
+                @forelse($mantenimientosRecientes ?? [] as $mantenimiento)
+                    <div class="list-item">
+                        <strong>{{ $mantenimiento->mantenimientoGeneral->nombre ?? 'N/A' }}</strong>
+                        <span class="badge info">${{ number_format($mantenimiento->costo ?? 0, 0, ',', '.') }}</span>
+                        <div class="meta">
+                            🚐 {{ $mantenimiento->vehiculo->placa ?? 'N/A' }} 
+                            | 📅 {{ \Carbon\Carbon::parse($mantenimiento->fecha_mantenimiento)->format('d/m/Y') }}
+                        </div>
+                        @if($mantenimiento->taller)
+                            <div class="meta">🏭 {{ $mantenimiento->taller }}</div>
+                        @endif
+                    </div>
+                @empty
+                    <div class="empty-state"><div class="icon">🔧</div><p>No hay mantenimientos registrados</p></div>
                 @endforelse
             </div>
 

@@ -36,6 +36,7 @@ class AdminController extends Controller
             ->orderBy('fecha_alerta', 'desc')
             ->limit(5)
             ->get();
+        $serviciosMantenimiento = ServicioMantenimiento::count();  
 
         $solicitudesRecientes = SolicitudCambioRuta::with(['conductor', 'vehiculo', 'tarifaDestino'])
             ->whereNull('autorizado_por')
@@ -58,7 +59,8 @@ class AdminController extends Controller
             'conductoresRecientes',
             'vehiculosRecientes',
             'propietariosRecientes',
-            'tarifasDestino'
+            'tarifasDestino',
+            'serviciosMantenimiento'
         ));
     }
 
@@ -179,4 +181,13 @@ public function rechazarSolicitud($id)
 
     return view('admin.mantenimiento-general', compact('mantenimientos', 'vehiculos'));
     }
+    public function servicioMantenimiento()
+{
+    $servicios = ServicioMantenimiento::with(['vehiculo', 'mantenimientoGeneral'])
+        ->orderBy('fecha_mantenimiento', 'desc')
+        ->paginate(20);
+    
+    return view('admin.servicio-mantenimiento', compact('servicios'));
+}
+    
 }

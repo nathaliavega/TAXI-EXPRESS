@@ -24,8 +24,4 @@ class MantenimientoGeneral extends Model
         'es_preventivo' => 'boolean',
         'activo' => 'boolean',
     ];
-    public function vehiculo()
-    {
-        return $this->belongsTo(Vehiculo::class, 'id_vehiculo', 'id_vehiculo');
-    }
 }

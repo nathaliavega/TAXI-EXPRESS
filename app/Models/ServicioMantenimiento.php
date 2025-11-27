@@ -24,13 +24,16 @@ class ServicioMantenimiento extends Model
 
     protected $casts = [
         'fecha_mantenimiento' => 'date',
+        'costo' => 'decimal:2',
     ];
 
+    // Relación con Vehículo
     public function vehiculo()
     {
         return $this->belongsTo(Vehiculo::class, 'id_vehiculo', 'id_vehiculo');
     }
 
+    // Relación con Mantenimiento General (tipo de mantenimiento)
     public function mantenimientoGeneral()
     {
         return $this->belongsTo(MantenimientoGeneral::class, 'id_mantenimiento_general', 'id_mantenimiento_general');
