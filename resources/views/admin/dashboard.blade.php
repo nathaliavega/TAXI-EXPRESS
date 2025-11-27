@@ -71,6 +71,11 @@
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             border-left: 4px solid #ff6b35;
+            transition: transform 0.2s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
         }
         .stat-card h3 { color: #666; font-size: 14px; margin-bottom: 10px; }
         .stat-card .number { font-size: 36px; font-weight: bold; color: #ff6b35; }
@@ -110,8 +115,12 @@
             font-size: 13px;
             color: #ff6b35;
             text-decoration: none;
+            transition: all 0.2s ease;
         }
-        .section h2 a:hover { text-decoration: underline; }
+        .section h2 a:hover { 
+            text-decoration: underline;
+            color: #ff5722;
+        }
         
         .list-item {
             padding: 15px;
@@ -119,8 +128,12 @@
             background: #f9f9f9;
             border-radius: 0 8px 8px 0;
             border-left: 4px solid #ff6b35;
+            transition: all 0.2s ease;
         }
-        .list-item:hover { background: #fff5f0; }
+        .list-item:hover { 
+            background: #fff5f0;
+            transform: translateX(5px);
+        }
         .list-item strong { color: #333; }
         .list-item .meta { font-size: 13px; color: #666; margin-top: 5px; }
         
@@ -128,6 +141,10 @@
             padding: 15px;
             margin-bottom: 10px;
             border-radius: 0 8px 8px 0;
+            transition: all 0.2s ease;
+        }
+        .alert-item:hover {
+            transform: translateX(5px);
         }
         .alert-item.critica { border-left: 4px solid #e53e3e; background: #fff5f5; }
         .alert-item.alta { border-left: 4px solid #dd6b20; background: #fffaf0; }
@@ -151,7 +168,7 @@
         .badge.success { background: #38a169; color: white; }
         .badge.warning { background: #d69e2e; color: #333; }
         .badge.danger { background: #e53e3e; color: white; }
-        .badge.info { background: #ff6b35; color: white; }
+        .badge.info { background: #805ad5; color: white; }
         .badge.secondary { background: #718096; color: white; }
         
         table { width: 100%; border-collapse: collapse; }
@@ -189,7 +206,9 @@
         @media (max-width: 768px) {
             .content-grid { grid-template-columns: 1fr; }
             .navbar { flex-direction: column; gap: 10px; }
+            .navbar h1 { font-size: 18px; text-align: center; }
             .menu-nav { justify-content: center; }
+            .stats-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -220,7 +239,8 @@
             <a href="{{ route('admin.alertas') }}">⚠️ Alertas</a>
             <a href="{{ route('admin.solicitudes-cambio-ruta') }}">📝 Control de Solicitudes</a>
             <a href="{{ route('admin.tarifas-destino') }}">💰 Tarifas</a>
-            <a href="{{ route('admin.admin.servicio-mantenimiento') }}">🔧 Mantenimientos</a>
+            <a href="{{ route('admin.mantenimiento-general') }}">📋 Tipos de Mantenimiento</a>
+            <a href="{{ route('admin.admin.servicio-mantenimiento') }}">🔧 Servicios Realizados</a>
         </div>
 
         <div class="stats-grid">
@@ -325,7 +345,7 @@
                         @forelse($vehiculosRecientes ?? [] as $vehiculo)
                             <tr>
                                 <td><strong>{{ $vehiculo->placa }}</strong></td>
-                                <td><span class="badge info">{{ $vehiculo->numero_interno }}</span></td>
+                                <td><span class="badge secondary">{{ $vehiculo->numero_interno }}</span></td>
                                 <td>{{ $vehiculo->marca }} {{ $vehiculo->modelo }}</td>
                                 <td><span class="badge {{ $vehiculo->estado == 'activo' ? 'success' : ($vehiculo->estado == 'en mantenimiento' ? 'warning' : 'secondary') }}">{{ ucfirst($vehiculo->estado) }}</span></td>
                             </tr>
