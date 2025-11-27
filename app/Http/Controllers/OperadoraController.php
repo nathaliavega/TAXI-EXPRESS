@@ -24,27 +24,24 @@ class OperadoraController extends Controller
             'turno.vehiculo',
             'turno.conductor'
         ])
-        ->whereHas('turno', function($query) {
-            $query->whereDate('fecha_turno', '>=', Carbon::today());
-        })
-        ->orderBy('id_control', 'desc')
-        ->paginate(20);
+       // Descomentar la opción que prefieras:
+    ->orderBy('id_control', 'desc')  // Por ID (más recientes primero)
+    // ->orderBy('hora_inicio', 'asc')  // Por hora de inicio
+    // ->orderByDesc('created_at')  // Por fecha de creación
+    ->paginate(20);  // 20 registros por página
 
-        // Obtener todos los vehículos y conductores para los selects de edición
-        // Usar los nombres correctos de las columnas de tu base de datos
-        $vehiculos = Vehiculo::select('id_vehiculo as id', 'placa')
-            ->where('estado', 'activo')
-            ->orderBy('placa')
-            ->get();
+    $vehiculos = Vehiculo::select('id_vehiculo as id', 'placa')
+        ->where('estado', 'activo')
+        ->orderBy('placa')
+        ->get();
 
-        $conductores = Conductor::select('id_conductor as id', 'primer_nombre', 'primer_apellido')
-            ->where('estado', 'activo')
-            ->orderBy('primer_nombre')
-            ->get();
+    $conductores = Conductor::select('id_conductor as id', 'primer_nombre', 'primer_apellido')
+        ->where('estado', 'activo')
+        ->orderBy('primer_nombre')
+        ->get();
 
-        return view('operadora.control-turnos', compact('controles', 'vehiculos', 'conductores'));
-    }
-
+    return view('operadora.control-turnos', compact('controles', 'vehiculos', 'conductores'));
+        }
     /**
      * Actualizar un control de turno
      */
