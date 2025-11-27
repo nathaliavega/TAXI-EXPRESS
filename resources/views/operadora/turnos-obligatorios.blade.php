@@ -372,6 +372,14 @@
                 </ul>
                 <button class="alert-close" onclick="this.parentElement.remove()">&times;</button>
             </div>
+            <script>
+                // Abrir modal si hay errores
+                @if (old('_method') === 'PUT')
+                    setTimeout(() => openCreateModal(), 100);
+                @else
+                    setTimeout(() => openCreateModal(), 100);
+                @endif
+            </script>
         @endif
 
         <div class="header-actions">

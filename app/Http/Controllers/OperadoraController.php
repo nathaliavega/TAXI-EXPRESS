@@ -173,52 +173,64 @@ class OperadoraController extends Controller
      */
     public function storeTurnoObligatorio(Request $request)
     {
-        $request->validate([
-            'id_vehiculo' => 'required|exists:vehiculos,id_vehiculo',
-            'id_conductor' => 'required|exists:conductores,id_conductor',
-            'fecha_turno' => 'required|date|after_or_equal:today',
-            'estado' => 'required|in:programado,cumplido,incumplido,justificado,cancelado'
-        ], [
-            'id_vehiculo.required' => 'Debe seleccionar un vehículo',
-            'id_vehiculo.exists' => 'El vehículo seleccionado no existe',
-            'id_conductor.required' => 'Debe seleccionar un conductor',
-            'id_conductor.exists' => 'El conductor seleccionado no existe',
-            'fecha_turno.required' => 'La fecha del turno es obligatoria',
-            'fecha_turno.date' => 'La fecha debe ser válida',
-            'fecha_turno.after_or_equal' => 'La fecha debe ser hoy o posterior',
-            'estado.required' => 'El estado es obligatorio',
-            'estado.in' => 'El estado seleccionado no es válido'
-        ]);
-
-        // Verificar si ya existe un turno para ese vehículo en esa fecha
-        $existe = TurnoObligatorio::where('id_vehiculo', $request->id_vehiculo)
-            ->where('fecha_turno', $request->fecha_turno)
-            ->exists();
-
-        if ($existe) {
-            return back()
-                ->withInput()
-                ->with('error', 'Ya existe un turno programado para este vehículo en esta fecha');
-        }
-
         try {
-            TurnoObligatorio::create([
+            $request->validate([
+                'id_vehiculo' => 'required|exists:vehiculos,id_vehiculo',
+                'id_conductor' => 'required|exists:conductores,id_conductor',
+                'fecha_turno' => 'required|date|after_or_equal:today',
+                'estado' => 'required|in:programado,cumplido,incumplido,justificado,cancelado'
+            ], [
+                'id_vehiculo.required' => 'Debe seleccionar un vehículo',
+                'id_vehiculo.exists' => 'El vehículo seleccionado no existe',
+                'id_conductor.required' => 'Debe seleccionar un conductor',
+                'id_conductor.exists' => 'El conductor seleccionado no existe',
+                'fecha_turno.required' => 'La fecha del turno es obligatoria',
+                'fecha_turno.date' => 'La fecha debe ser válida',
+                'fecha_turno.after_or_equal' => 'La fecha debe ser hoy o posterior',
+                'estado.required' => 'El estado es obligatorio',
+                'estado.in' => 'El estado seleccionado no es válido'
+            ]);
+
+            // Verificar si ya existe un turno para ese vehículo en esa fecha
+            $existe = TurnoObligatorio::where('id_vehiculo', $request->id_vehiculo)
+                ->whereDate('fecha_turno', $request->fecha_turno)
+                ->exists();
+
+            if ($existe) {
+                return back()
+                    ->withInput()
+                    ->withErrors(['error' => 'Ya existe un turno programado para este vehículo en esta fecha']);
+            }
+
+            DB::beginTransaction();
+
+            $turno = TurnoObligatorio::create([
                 'id_vehiculo' => $request->id_vehiculo,
                 'id_conductor' => $request->id_conductor,
                 'fecha_turno' => $request->fecha_turno,
                 'estado' => $request->estado,
                 'asignado_por' => Auth::id(),
-                'fecha_asignacion' => now() // Asegurar que siempre tenga fecha
+                'fecha_asignacion' => now()
             ]);
+
+            DB::commit();
 
             return redirect()
                 ->route('operadora.turnos-obligatorios')
                 ->with('success', 'Turno obligatorio creado exitosamente');
-        } catch (\Exception $e) {
-            Log::error('Error al crear turno obligatorio: ' . $e->getMessage());
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
             return back()
                 ->withInput()
-                ->with('error', 'Error al crear el turno obligatorio');
+                ->withErrors($e->errors());
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error al crear turno obligatorio: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            
+            return back()
+                ->withInput()
+                ->withErrors(['error' => 'Error al crear el turno: ' . $e->getMessage()]);
         }
     }
 
