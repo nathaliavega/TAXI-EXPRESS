@@ -17,35 +17,34 @@ class OperadoraController extends Controller
     public function dashboard()
     {
         // Turnos de hoy
-        $turnosHoy = TurnoObligatorio::whereDate('fecha_turno', Carbon::today())
-            ->count();
+    $turnosHoy = TurnoObligatorio::whereDate('fecha_turno', Carbon::today())
+        ->count();
 
-        // Vehículos activos (en lugar de conductores)
-        $vehiculosActivos = Vehiculo::where('estado', 'activo')->count();
+    // Vehículos activos (en lugar de conductores)
+    $vehiculosActivos = Vehiculo::where('estado', 'activo')->count();
 
-        // Turnos pendientes/programados
-        $turnosPendientes = TurnoObligatorio::where('estado', 'programado')
-            ->whereDate('fecha_turno', '>=', Carbon::today())
-            ->count();
+    // Turnos pendientes/programados
+    $turnosPendientes = TurnoObligatorio::where('estado', 'programado')
+        ->whereDate('fecha_turno', '>=', Carbon::today())
+        ->count();
 
-        // Turnos completados
-        $turnosCompletados = TurnoObligatorio::where('estado', 'cumplido')
-            ->count();
+    // Turnos completados
+    $turnosCompletados = TurnoObligatorio::where('estado', 'cumplido')
+        ->count();
 
-        // Turnos recientes (últimos 10)
-        $turnosRecientes = TurnoObligatorio::with(['vehiculo', 'conductor'])
-            ->orderBy('fecha_turno', 'desc')
-            ->orderBy('created_at', 'desc')
-            ->limit(10)
-            ->get();
+    // Turnos recientes (últimos 10) - SOLO ordenar por fecha_turno
+    $turnosRecientes = TurnoObligatorio::with(['vehiculo', 'conductor'])
+        ->orderBy('fecha_turno', 'desc')
+        ->limit(10)
+        ->get();
 
-        return view('operadora.dashboard', compact(
-            'turnosHoy',
-            'vehiculosActivos',
-            'turnosPendientes',
-            'turnosCompletados',
-            'turnosRecientes'
-        ));
+    return view('operadora.dashboard', compact(
+        'turnosHoy',
+        'vehiculosActivos',
+        'turnosPendientes',
+        'turnosCompletados',
+        'turnosRecientes'
+    ));
     }
 
     public function controlTurnos()
