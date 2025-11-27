@@ -84,6 +84,10 @@
             border-left: 4px solid #9c27b0;
             margin-bottom: 10px;
             background: #f9f9f9;
+            border-radius: 5px;
+        }
+        .turno-item strong {
+            color: #333;
         }
         .menu-links {
             display: flex;
@@ -116,15 +120,41 @@
             margin-bottom: 20px;
             border: 1px solid #f5c6cb;
         }
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+            margin-left: 5px;
+        }
+        .badge.programado {
+            background: #2196F3;
+            color: white;
+        }
+        .badge.cumplido {
+            background: #4CAF50;
+            color: white;
+        }
+        .badge.incumplido {
+            background: #f44336;
+            color: white;
+        }
+        .badge.justificado {
+            background: #FF9800;
+            color: white;
+        }
+        .badge.cancelado {
+            background: #9E9E9E;
+            color: white;
+        }
     </style>
 </head>
 <body>
     <div class="navbar">
         <h1>Panel de Operadora - Taxi Express Pamplona</h1>
         <div class="user-info">
-            {{-- ✅ CORRECCIÓN 1: Cambiar nombre_completo por nombre + apellido --}}
             <span>Bienvenida, {{ Auth::user()->nombre }} {{ Auth::user()->apellido }}</span>
-            {{-- ✅ CORRECCIÓN 2: Cambiar route('login') por route('logout') --}}
             <form action="{{ route('logout') }}" method="POST" style="display: inline;">
                 @csrf
                 <button type="submit" class="btn-logout">Cerrar Sesión</button>
@@ -154,12 +184,11 @@
         <div class="stats-grid">
             <div class="stat-card">
                 <h3>Turnos de Hoy</h3>
-                {{-- ✅ CORRECCIÓN 4: Si $turnosHoy es un número, no uses ->count() --}}
                 <div class="number">{{ $turnosHoy ?? 0 }}</div>
             </div>
             <div class="stat-card">
-                <h3>Conductores Activos</h3>
-                <div class="number">{{ $conductoresActivos ?? 0 }}</div>
+                <h3>Vehículos Activos</h3>
+                <div class="number">{{ $vehiculosActivos ?? 0 }}</div>
             </div>
             <div class="stat-card">
                 <h3>Turnos Pendientes</h3>
@@ -173,16 +202,15 @@
 
         <div class="turnos-section">
             <h2>Turnos Recientes</h2>
-            {{-- ✅ CORRECCIÓN 5: Cambiar $turnosHoy por $turnosRecientes --}}
             @forelse($turnosRecientes ?? [] as $turno)
                 <div class="turno-item">
                     <strong>Vehículo:</strong> {{ $turno->vehiculo->placa ?? 'N/A' }} - Móvil {{ $turno->vehiculo->numero_interno ?? 'N/A' }}<br>
-                    <strong>Conductor:</strong> {{ $turno->conductor->nombre ?? 'N/A' }} {{ $turno->conductor->apellido ?? '' }}<br>
-                    <strong>Hora:</strong> {{ $turno->hora_inicio ? $turno->hora_inicio->format('H:i') : 'N/A' }} - {{ $turno->hora_fin ? $turno->hora_fin->format('H:i') : 'N/A' }}<br>
-                    <strong>Estado:</strong> {{ ucfirst($turno->estado ?? 'pendiente') }}
+                    <strong>Conductor:</strong> {{ $turno->conductor->primer_nombre ?? 'N/A' }} {{ $turno->conductor->primer_apellido ?? '' }}<br>
+                    <strong>Fecha:</strong> {{ $turno->fecha_turno ? \Carbon\Carbon::parse($turno->fecha_turno)->format('d/m/Y') : 'N/A' }}<br>
+                    <strong>Estado:</strong> <span class="badge {{ $turno->estado }}">{{ ucfirst($turno->estado ?? 'programado') }}</span>
                 </div>
             @empty
-                <p>No hay turnos programados para hoy.</p>
+                <p style="text-align: center; color: #666; padding: 20px;">No hay turnos recientes.</p>
             @endforelse
         </div>
     </div>
