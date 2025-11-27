@@ -220,7 +220,7 @@
             <a href="{{ route('admin.alertas') }}">⚠️ Alertas</a>
             <a href="{{ route('admin.solicitudes-cambio-ruta') }}">📝 Control de Solicitudes</a>
             <a href="{{ route('admin.tarifas-destino') }}">💰 Tarifas</a>
-            <a href="{{ route('admin.servicio-mantenimiento') }}">🔧 Mantenimientos</a>
+            <a href="{{ route('admin.admin.servicio-mantenimiento') }}">🔧 Mantenimientos</a>
         </div>
 
         <div class="stats-grid">
@@ -266,7 +266,7 @@
             </div>
 
             <div class="section">
-                <h2>🔧 Mantenimientos Recientes <a href="{{ route('admin.servicio-mantenimiento') }}">Ver todos →</a></h2>
+                <h2>🔧 Mantenimientos Recientes <a href="{{ route('admin.admin.servicio-mantenimiento') }}">Ver todos →</a></h2>
                 @forelse($mantenimientosRecientes ?? [] as $mantenimiento)
                     <div class="list-item">
                         <strong>{{ $mantenimiento->mantenimientoGeneral->nombre ?? 'N/A' }}</strong>

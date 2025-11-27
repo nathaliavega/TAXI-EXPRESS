@@ -61,7 +61,9 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/tarifas-destino', [TarifaDestinoController::class, 'store'])->name('tarifas-destino.store');
         Route::put('/tarifas-destino/{id}', [TarifaDestinoController::class, 'update'])->name('tarifas-destino.update');
         Route::delete('/tarifas-destino/{id}', [TarifaDestinoController::class, 'destroy'])->name('tarifas-destino.destroy');
-        Route::get('/servicio-mantenimiento', [AdminController::class, 'servicioMantenimiento'])->name('admin.servicio-mantenimiento');
+        
+        Route::get('/servicio-mantenimiento', [AdminController::class, 'ServicioMantenimiento'])->name('admin.servicio-mantenimiento');
+        
         Route::get('/fix-estados', function() {
         DB::table('tarifas_destinos')
             ->whereNull('estado')
