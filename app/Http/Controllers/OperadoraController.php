@@ -152,8 +152,7 @@ class OperadoraController extends Controller
             'conductor',
             'asignadoPor'
         ])
-        ->whereDate('fecha_turno', '>=', Carbon::today())
-        ->orderBy('fecha_turno', 'asc')
+        ->orderBy('fecha_turno', 'desc')
         ->paginate(20);
 
         // Obtener vehículos y conductores activos para los modales
