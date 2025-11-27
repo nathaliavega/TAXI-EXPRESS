@@ -36,7 +36,13 @@ class AdminController extends Controller
             ->orderBy('fecha_alerta', 'desc')
             ->limit(5)
             ->get();
-        $serviciosMantenimiento = ServicioMantenimiento::count();  
+         $serviciosMantenimiento = ServicioMantenimiento::count();
+    
+    // Obtener mantenimientos recientes
+        $mantenimientosRecientes = ServicioMantenimiento::with(['vehiculo', 'mantenimientoGeneral'])
+            ->orderBy('fecha_mantenimiento', 'desc')
+            ->limit(5)
+            ->get();
 
         $solicitudesRecientes = SolicitudCambioRuta::with(['conductor', 'vehiculo', 'tarifaDestino'])
             ->whereNull('autorizado_por')
@@ -60,7 +66,9 @@ class AdminController extends Controller
             'vehiculosRecientes',
             'propietariosRecientes',
             'tarifasDestino',
-            'serviciosMantenimiento'
+            'serviciosMantenimiento',
+            'mantenimientosRecientes'
+
         ));
     }
 
