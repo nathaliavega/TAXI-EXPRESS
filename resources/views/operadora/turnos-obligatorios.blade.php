@@ -411,7 +411,7 @@
                                     </span>
                                 </td>
                                 <td>{{ $turno->asignadoPor->nombre ?? 'Sistema' }}</td>
-                                <td>{{ $turno->fecha_asignacion->format('d/m/Y H:i') }}</td>
+                                <td>{{ $turno->fecha_asignacion ? $turno->fecha_asignacion->format('d/m/Y H:i') : 'N/A' }}</td>
                                 <td>
                                     <div class="actions">
                                         <button class="btn-action btn-edit" onclick='openEditModal(@json($turno))'>Editar</button>

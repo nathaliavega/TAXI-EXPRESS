@@ -207,7 +207,8 @@ class OperadoraController extends Controller
                 'id_conductor' => $request->id_conductor,
                 'fecha_turno' => $request->fecha_turno,
                 'estado' => $request->estado,
-                'asignado_por' => Auth::id()
+                'asignado_por' => Auth::id(),
+                'fecha_asignacion' => now() // Asegurar que siempre tenga fecha
             ]);
 
             return redirect()
