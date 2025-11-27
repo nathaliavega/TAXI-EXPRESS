@@ -169,9 +169,15 @@ public function rechazarSolicitud($id)
 
     public function mantenimientoGeneral()
     {
-        $mantenimientos = MantenimientoGeneral::orderBy('nombre', 'asc')
-            ->paginate(20);
-        
-        return view('admin.mantenimiento-general', compact('mantenimientos'));
+       $mantenimientos = MantenimientoGeneral::with('vehiculo')
+        ->orderBy('fecha_programada', 'desc')
+        ->paginate(20);
+
+    // Agregar esta línea para obtener los vehículos
+    $vehiculos = Vehiculo::where('estado', 'activo')
+        ->orderBy('numero_interno', 'asc')
+        ->get();
+
+    return view('admin.mantenimiento-general', compact('mantenimientos', 'vehiculos'));
     }
 }
