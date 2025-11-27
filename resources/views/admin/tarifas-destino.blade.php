@@ -257,34 +257,6 @@
             </div>
         @endif
 
-        <!-- Estadísticas -->
-        <div class="row g-3 mb-4">
-            <div class="col-md-3">
-                <div class="stat-box">
-                    <div class="stat-label">Total Destinos</div>
-                    <h2 class="stat-number">{{ $tarifas->count() }}</h2>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-box">
-                    <div class="stat-label">Tarifas Activas</div>
-                    <h2 class="stat-number">{{ $tarifas->where('estado', 'Activa')->count() }}</h2>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-box">
-                    <div class="stat-label">Tarifa Promedio</div>
-                    <h2 class="stat-number">${{ number_format($tarifas->avg('tarifa_base'), 0) }}</h2>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-box">
-                    <div class="stat-label">Ciudades</div>
-                    <h2 class="stat-number">{{ $tarifas->unique('ciudad')->count() }}</h2>
-                </div>
-            </div>
-        </div>
-
         <!-- Tabla -->
         <div class="table-box">
             <div class="table-header d-flex justify-content-between align-items-center">
