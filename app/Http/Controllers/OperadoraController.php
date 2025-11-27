@@ -349,9 +349,9 @@ class OperadoraController extends Controller
     public function vehiculos()
     {
         $vehiculos = Vehiculo::with('propietario')
-            ->where('estado', 'activo')
+           
             ->orderBy('numero_interno', 'asc')
-            ->paginate(20);
+            ->paginate(50);
 
         return view('operadora.vehiculos', compact('vehiculos'));
     }
