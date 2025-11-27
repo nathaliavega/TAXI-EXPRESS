@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 class TurnoObligatorio extends Model
@@ -51,6 +52,16 @@ class TurnoObligatorio extends Model
         static::creating(function ($turno) {
             if (empty($turno->fecha_asignacion)) {
                 $turno->fecha_asignacion = now();
+            }
+        });
+
+        // 🔥 SOLUCIÓN: Sincronizar la secuencia después de crear un turno
+        static::created(function ($turno) {
+            try {
+                DB::statement("SELECT setval('turnos_obligatorios_id_turno_seq', 
+                    (SELECT COALESCE(MAX(id_turno), 0) FROM turnos_obligatorios))");
+            } catch (\Exception $e) {
+                \Log::warning('No se pudo sincronizar la secuencia: ' . $e->getMessage());
             }
         });
     }
