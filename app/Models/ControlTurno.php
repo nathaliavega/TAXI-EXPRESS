@@ -9,6 +9,7 @@ class ControlTurno extends Model
     protected $table = 'control_turnos';
     protected $primaryKey = 'id_control';
     public $timestamps = true;
+    
 
     protected $fillable = [
         'id_turno',
