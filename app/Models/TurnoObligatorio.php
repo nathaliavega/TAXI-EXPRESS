@@ -70,7 +70,7 @@ class TurnoObligatorio extends Model
     // Relación con Usuario (quien asignó)
     public function asignadoPor()
     {
-        return $this->belongsTo(Usuario::class, 'asignado_por', 'id_usuario');
+        return $this->belongsTo(User::class, 'asignado_por', 'id_usuario');
     }
 
     // Scope para filtrar por estado
