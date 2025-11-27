@@ -57,7 +57,7 @@ class OperadoraController extends Controller
                 'conductor_id' => 'required|exists:conductores,id_conductor',
                 'nombre_franja' => 'required|in:Turno_noche,Turno_mañana',
                 'hora_inicio' => 'required|date_format:H:i',
-                'hora_fin' => 'required|date_format:H:i|after:hora_inicio',
+                'hora_fin' => 'required|date_format:H:i',
                 'hora_llamado' => 'required|date_format:H:i',
                 'respondio' => 'required|boolean',
                 'en_servicio' => 'required|boolean'

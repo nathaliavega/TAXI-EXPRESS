@@ -393,6 +393,9 @@
                 return;
             }
 
+            // NO validamos que hora_fin > hora_inicio porque en turnos nocturnos
+            // la hora fin puede ser del día siguiente
+
             row.classList.add('loading');
 
             try {
