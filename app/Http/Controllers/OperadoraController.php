@@ -16,7 +16,36 @@ class OperadoraController extends Controller
 {
     public function dashboard()
     {
-        return view('operadora.dashboard');
+        // Turnos de hoy
+        $turnosHoy = TurnoObligatorio::whereDate('fecha_turno', Carbon::today())
+            ->count();
+
+        // Vehículos activos (en lugar de conductores)
+        $vehiculosActivos = Vehiculo::where('estado', 'activo')->count();
+
+        // Turnos pendientes/programados
+        $turnosPendientes = TurnoObligatorio::where('estado', 'programado')
+            ->whereDate('fecha_turno', '>=', Carbon::today())
+            ->count();
+
+        // Turnos completados
+        $turnosCompletados = TurnoObligatorio::where('estado', 'cumplido')
+            ->count();
+
+        // Turnos recientes (últimos 10)
+        $turnosRecientes = TurnoObligatorio::with(['vehiculo', 'conductor'])
+            ->orderBy('fecha_turno', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+
+        return view('operadora.dashboard', compact(
+            'turnosHoy',
+            'vehiculosActivos',
+            'turnosPendientes',
+            'turnosCompletados',
+            'turnosRecientes'
+        ));
     }
 
     public function controlTurnos()
@@ -143,7 +172,7 @@ class OperadoraController extends Controller
     }
 
     /**
-     * Mostrar listado de turnos obligatorios
+     * Mostrar listado de turnos obligatorios - MUESTRA TODOS LOS TURNOS
      */
     public function turnosObligatorios()
     {
@@ -152,7 +181,7 @@ class OperadoraController extends Controller
             'conductor',
             'asignadoPor'
         ])
-        ->orderBy('fecha_turno', 'desc')
+        ->orderBy('fecha_turno', 'desc') // Más recientes primero
         ->paginate(20);
 
         // Obtener vehículos y conductores activos para los modales
