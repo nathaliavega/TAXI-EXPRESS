@@ -16,7 +16,8 @@ class MantenimientoGeneral extends Model
         'cambio_neumaticos',
         'kilometraje_recomendado',
         'es_preventivo',
-        'activo'
+        'activo',
+        'fecha_programada'
     ];
 
     protected $casts = [
