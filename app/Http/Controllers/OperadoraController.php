@@ -204,14 +204,21 @@ class OperadoraController extends Controller
 
             DB::beginTransaction();
 
-            $turno = TurnoObligatorio::create([
-                'id_vehiculo' => $request->id_vehiculo,
-                'id_conductor' => $request->id_conductor,
+            // Debug: Verificar datos antes de crear
+            $datosCreacion = [
+                'id_vehiculo' => (int)$request->id_vehiculo,
+                'id_conductor' => (int)$request->id_conductor,
                 'fecha_turno' => $request->fecha_turno,
                 'estado' => $request->estado,
                 'asignado_por' => Auth::id(),
                 'fecha_asignacion' => now()
-            ]);
+            ];
+
+            Log::info('Intentando crear turno con datos:', $datosCreacion);
+
+            $turno = TurnoObligatorio::create($datosCreacion);
+
+            Log::info('Turno creado exitosamente con ID: ' . $turno->id_turno);
 
             DB::commit();
 
