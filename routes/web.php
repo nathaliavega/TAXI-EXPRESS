@@ -76,8 +76,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/control-turnos', [OperadoraController::class, 'controlTurnos'])->name('control-turnos');
         Route::put('/control-turnos/{id}', [OperadoraController::class, 'updateControlTurno'])->name('control-turnos.update');
         Route::delete('/control-turnos/{id}', [OperadoraController::class, 'deleteControlTurno'])->name('control-turnos.destroy');
-    
         Route::get('/turnos-obligatorios', [OperadoraController::class, 'turnosObligatorios'])->name('turnos-obligatorios');
+        Route::post('/turnos-obligatorios', [OperadoraController::class, 'storeTurnoObligatorio'])->name('operadora.turnos-obligatorios.store');
+        Route::put('/turnos-obligatorios/{id}', [OperadoraController::class, 'updateTurnoObligatorio'])->name('operadora.turnos-obligatorios.update');
+        Route::delete('/turnos-obligatorios/{id}', [OperadoraController::class, 'destroyTurnoObligatorio'])->name('operadora.turnos-obligatorios.destroy');
         Route::get('/vehiculos', [OperadoraController::class, 'vehiculos'])->name('vehiculos');
         
     });

@@ -10,6 +10,7 @@ use App\Models\Conductor;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class OperadoraController extends Controller
 {
@@ -24,31 +25,28 @@ class OperadoraController extends Controller
             'turno.vehiculo',
             'turno.conductor'
         ])
-       // Descomentar la opción que prefieras:
-    ->orderBy('id_control', 'desc')  // Por ID (más recientes primero)
-    // ->orderBy('hora_inicio', 'asc')  // Por hora de inicio
-    // ->orderByDesc('created_at')  // Por fecha de creación
-    ->paginate(20);  // 20 registros por página
+        ->orderBy('id_control', 'desc')
+        ->paginate(20);
 
-    $vehiculos = Vehiculo::select('id_vehiculo as id', 'placa')
-        ->where('estado', 'activo')
-        ->orderBy('placa')
-        ->get();
+        $vehiculos = Vehiculo::select('id_vehiculo as id', 'placa')
+            ->where('estado', 'activo')
+            ->orderBy('placa')
+            ->get();
 
-    $conductores = Conductor::select('id_conductor as id', 'primer_nombre', 'primer_apellido')
-        ->where('estado', 'activo')
-        ->orderBy('primer_nombre')
-        ->get();
+        $conductores = Conductor::select('id_conductor as id', 'primer_nombre', 'primer_apellido')
+            ->where('estado', 'activo')
+            ->orderBy('primer_nombre')
+            ->get();
 
-    return view('operadora.control-turnos', compact('controles', 'vehiculos', 'conductores'));
-        }
+        return view('operadora.control-turnos', compact('controles', 'vehiculos', 'conductores'));
+    }
+
     /**
      * Actualizar un control de turno
      */
     public function updateControlTurno(Request $request, $id)
     {
         try {
-            // Validar datos
             $validated = $request->validate([
                 'vehiculo_id' => 'required|exists:vehiculos,id_vehiculo',
                 'conductor_id' => 'required|exists:conductores,id_conductor',
@@ -62,38 +60,30 @@ class OperadoraController extends Controller
 
             DB::beginTransaction();
 
-            // Encontrar el control de turno usando la primary key correcta
             $control = ControlTurno::where('id_control', $id)->firstOrFail();
             
-            // Verificar si cambió el vehículo o conductor
             $turno = $control->turno;
             if ($turno->id_vehiculo != $validated['vehiculo_id'] || 
                 $turno->id_conductor != $validated['conductor_id']) {
                 
-                // Buscar un turno existente con el nuevo vehículo/conductor
                 $nuevoTurno = TurnoObligatorio::where('id_vehiculo', $validated['vehiculo_id'])
                     ->where('id_conductor', $validated['conductor_id'])
                     ->where('fecha_turno', Carbon::today())
                     ->first();
                 
                 if ($nuevoTurno) {
-                    // Si existe, usar ese turno
                     $control->id_turno = $nuevoTurno->id_turno;
                 } else {
-                    // Si no existe, mantener el turno actual y solo actualizar sus datos
                     $turno->id_vehiculo = $validated['vehiculo_id'];
                     $turno->id_conductor = $validated['conductor_id'];
                     $turno->save();
                 }
             }
 
-            // Determinar si el turno cruza medianoche
-            // Comparar las horas: si hora_fin < hora_inicio, cruza medianoche
             $horaInicio = strtotime($validated['hora_inicio']);
             $horaFin = strtotime($validated['hora_fin']);
             $cruzaMedianoche = $horaFin < $horaInicio;
 
-            // Actualizar el control
             $control->nombre_franja = $validated['nombre_franja'];
             $control->hora_inicio = $validated['hora_inicio'];
             $control->hora_fin = $validated['hora_fin'];
@@ -101,7 +91,6 @@ class OperadoraController extends Controller
             $control->respondio = $validated['respondio'];
             $control->en_servicio = $validated['en_servicio'];
             $control->cruza_medianoche = $cruzaMedianoche;
-            // id_operadora no se modifica, mantiene la operadora original
             $control->save();
 
             DB::commit();
@@ -136,7 +125,6 @@ class OperadoraController extends Controller
     public function deleteControlTurno($id)
     {
         try {
-            // Usar la primary key correcta
             $control = ControlTurno::where('id_control', $id)->firstOrFail();
             $control->delete();
 
@@ -154,6 +142,9 @@ class OperadoraController extends Controller
         }
     }
 
+    /**
+     * Mostrar listado de turnos obligatorios
+     */
     public function turnosObligatorios()
     {
         $turnos = TurnoObligatorio::with([
@@ -165,7 +156,147 @@ class OperadoraController extends Controller
         ->orderBy('fecha_turno', 'asc')
         ->paginate(20);
 
-        return view('operadora.turnos-obligatorios', compact('turnos'));
+        // Obtener vehículos y conductores activos para los modales
+        $vehiculos = Vehiculo::where('estado', 'activo')
+            ->orderBy('numero_interno', 'asc')
+            ->get();
+
+        $conductores = Conductor::where('estado', 'activo')
+            ->orderBy('primer_nombre', 'asc')
+            ->get();
+
+        return view('operadora.turnos-obligatorios', compact('turnos', 'vehiculos', 'conductores'));
+    }
+
+    /**
+     * Crear un nuevo turno obligatorio
+     */
+    public function storeTurnoObligatorio(Request $request)
+    {
+        $request->validate([
+            'id_vehiculo' => 'required|exists:vehiculos,id_vehiculo',
+            'id_conductor' => 'required|exists:conductores,id_conductor',
+            'fecha_turno' => 'required|date|after_or_equal:today',
+            'estado' => 'required|in:programado,cumplido,incumplido,justificado,cancelado'
+        ], [
+            'id_vehiculo.required' => 'Debe seleccionar un vehículo',
+            'id_vehiculo.exists' => 'El vehículo seleccionado no existe',
+            'id_conductor.required' => 'Debe seleccionar un conductor',
+            'id_conductor.exists' => 'El conductor seleccionado no existe',
+            'fecha_turno.required' => 'La fecha del turno es obligatoria',
+            'fecha_turno.date' => 'La fecha debe ser válida',
+            'fecha_turno.after_or_equal' => 'La fecha debe ser hoy o posterior',
+            'estado.required' => 'El estado es obligatorio',
+            'estado.in' => 'El estado seleccionado no es válido'
+        ]);
+
+        // Verificar si ya existe un turno para ese vehículo en esa fecha
+        $existe = TurnoObligatorio::where('id_vehiculo', $request->id_vehiculo)
+            ->where('fecha_turno', $request->fecha_turno)
+            ->exists();
+
+        if ($existe) {
+            return back()
+                ->withInput()
+                ->with('error', 'Ya existe un turno programado para este vehículo en esta fecha');
+        }
+
+        try {
+            TurnoObligatorio::create([
+                'id_vehiculo' => $request->id_vehiculo,
+                'id_conductor' => $request->id_conductor,
+                'fecha_turno' => $request->fecha_turno,
+                'estado' => $request->estado,
+                'asignado_por' => Auth::id()
+            ]);
+
+            return redirect()
+                ->route('operadora.turnos-obligatorios')
+                ->with('success', 'Turno obligatorio creado exitosamente');
+        } catch (\Exception $e) {
+            Log::error('Error al crear turno obligatorio: ' . $e->getMessage());
+            return back()
+                ->withInput()
+                ->with('error', 'Error al crear el turno obligatorio');
+        }
+    }
+
+    /**
+     * Actualizar un turno obligatorio
+     */
+    public function updateTurnoObligatorio(Request $request, $id)
+    {
+        $turno = TurnoObligatorio::findOrFail($id);
+
+        $request->validate([
+            'id_vehiculo' => 'required|exists:vehiculos,id_vehiculo',
+            'id_conductor' => 'required|exists:conductores,id_conductor',
+            'fecha_turno' => 'required|date',
+            'estado' => 'required|in:programado,cumplido,incumplido,justificado,cancelado'
+        ], [
+            'id_vehiculo.required' => 'Debe seleccionar un vehículo',
+            'id_vehiculo.exists' => 'El vehículo seleccionado no existe',
+            'id_conductor.required' => 'Debe seleccionar un conductor',
+            'id_conductor.exists' => 'El conductor seleccionado no existe',
+            'fecha_turno.required' => 'La fecha del turno es obligatoria',
+            'fecha_turno.date' => 'La fecha debe ser válida',
+            'estado.required' => 'El estado es obligatorio',
+            'estado.in' => 'El estado seleccionado no es válido'
+        ]);
+
+        // Verificar si ya existe otro turno para ese vehículo en esa fecha (excepto el actual)
+        $existe = TurnoObligatorio::where('id_vehiculo', $request->id_vehiculo)
+            ->where('fecha_turno', $request->fecha_turno)
+            ->where('id_turno', '!=', $id)
+            ->exists();
+
+        if ($existe) {
+            return back()
+                ->withInput()
+                ->with('error', 'Ya existe otro turno programado para este vehículo en esta fecha');
+        }
+
+        try {
+            $turno->update([
+                'id_vehiculo' => $request->id_vehiculo,
+                'id_conductor' => $request->id_conductor,
+                'fecha_turno' => $request->fecha_turno,
+                'estado' => $request->estado
+            ]);
+
+            return redirect()
+                ->route('operadora.turnos-obligatorios')
+                ->with('success', 'Turno obligatorio actualizado exitosamente');
+        } catch (\Exception $e) {
+            Log::error('Error al actualizar turno obligatorio: ' . $e->getMessage());
+            return back()
+                ->withInput()
+                ->with('error', 'Error al actualizar el turno obligatorio');
+        }
+    }
+
+    /**
+     * Eliminar un turno obligatorio
+     */
+    public function destroyTurnoObligatorio($id)
+    {
+        try {
+            $turno = TurnoObligatorio::findOrFail($id);
+            
+            // Verificar si el turno ya fue cumplido
+            if ($turno->estado == 'cumplido') {
+                return back()->with('error', 'No se puede eliminar un turno que ya fue cumplido');
+            }
+
+            $turno->delete();
+
+            return redirect()
+                ->route('operadora.turnos-obligatorios')
+                ->with('success', 'Turno obligatorio eliminado exitosamente');
+        } catch (\Exception $e) {
+            Log::error('Error al eliminar turno obligatorio: ' . $e->getMessage());
+            return back()->with('error', 'Error al eliminar el turno obligatorio');
+        }
     }
 
     public function vehiculos()
