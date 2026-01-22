@@ -20,19 +20,17 @@ class OperadoraController extends Controller
     $turnosHoy = TurnoObligatorio::whereDate('fecha_turno', Carbon::today())
         ->count();
 
-    // Vehículos activos (en lugar de conductores)
+   
     $vehiculosActivos = Vehiculo::where('estado', 'activo')->count();
 
-    // Turnos pendientes/programados
     $turnosPendientes = TurnoObligatorio::where('estado', 'programado')
         ->whereDate('fecha_turno', '>=', Carbon::today())
         ->count();
 
-    // Turnos completados
+    
     $turnosCompletados = TurnoObligatorio::where('estado', 'cumplido')
         ->count();
 
-    // Turnos recientes (últimos 10) - SOLO ordenar por fecha_turno
     $turnosRecientes = TurnoObligatorio::with(['vehiculo', 'conductor'])
         ->orderBy('fecha_turno', 'desc')
         ->limit(10)

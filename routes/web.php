@@ -38,7 +38,6 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
     Route::get('/logout', [LoginController::class, 'logout'])->name('logout.get');
     
-    // Admin
     Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
         Route::get('/vehiculos', [AdminController::class, 'vehiculos'])->name('vehiculos');
@@ -50,20 +49,13 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/mantenimiento-general', [AdminController::class, 'storeMantenimiento'])->name('mantenimiento-general.store');
         Route::put('/mantenimiento-general/{id}', [AdminController::class, 'updateMantenimiento'])->name('mantenimiento-general.update');
         Route::delete('/mantenimiento-general/{id}', [AdminController::class, 'destroyMantenimiento'])->name('mantenimiento-general.destroy');
-        // Solicitudes - aprobar/rechazar
-        Route::patch('/solicitudes/aprobar/{id}', [AdminController::class, 'aprobarSolicitud'])
-            ->name('solicitudes.aprobar');
-        Route::patch('/solicitudes/rechazar/{id}', [AdminController::class, 'rechazarSolicitud'])
-            ->name('solicitudes.rechazar');
-        
-        // ⬇️ TARIFAS DESTINO - SOLO ESTAS DOS RUTAS
+        Route::patch('/solicitudes/aprobar/{id}', [AdminController::class, 'aprobarSolicitud'])->name('solicitudes.aprobar');
+        Route::patch('/solicitudes/rechazar/{id}', [AdminController::class, 'rechazarSolicitud'])->name('solicitudes.rechazar');
         Route::get('/tarifas-destino', [TarifaDestinoController::class, 'index'])->name('tarifas-destino');
         Route::post('/tarifas-destino', [TarifaDestinoController::class, 'store'])->name('tarifas-destino.store');
         Route::put('/tarifas-destino/{id}', [TarifaDestinoController::class, 'update'])->name('tarifas-destino.update');
         Route::delete('/tarifas-destino/{id}', [TarifaDestinoController::class, 'destroy'])->name('tarifas-destino.destroy');
-        
         Route::get('/servicio-mantenimiento', [AdminController::class, 'ServicioMantenimiento'])->name('admin.servicio-mantenimiento');
-        
         Route::get('/fix-estados', function() {
         DB::table('tarifas_destinos')
             ->whereNull('estado')

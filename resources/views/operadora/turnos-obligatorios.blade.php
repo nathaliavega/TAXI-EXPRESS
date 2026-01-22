@@ -574,7 +574,7 @@
     </div>
 
     <script>
-        // Funciones para modal CREAR
+       
         function openCreateModal() {
             document.getElementById('modalCrear').classList.add('active');
             document.body.style.overflow = 'hidden';
@@ -585,19 +585,15 @@
             document.body.style.overflow = 'auto';
         }
 
-        // Funciones para modal EDITAR
         function openEditModal(turno) {
             const modal = document.getElementById('modalEditar');
             const form = document.getElementById('formEditar');
-            
-            // Configurar la acción del formulario
+   
             form.action = `/operadora/turnos-obligatorios/${turno.id_turno}`;
             
-            // Llenar los campos
             document.getElementById('edit_id_vehiculo').value = turno.id_vehiculo;
             document.getElementById('edit_id_conductor').value = turno.id_conductor;
             
-            // Formatear fecha correctamente
             let fechaTurno = turno.fecha_turno;
             if (typeof fechaTurno === 'object' && fechaTurno.date) {
                 fechaTurno = fechaTurno.date.split(' ')[0];
@@ -607,7 +603,6 @@
             document.getElementById('edit_fecha_turno').value = fechaTurno;
             document.getElementById('edit_estado').value = turno.estado;
             
-            // Mostrar información de asignación
             if (turno.asignado_por) {
                 document.getElementById('infoBox').style.display = 'block';
                 const nombreAsignado = turno.asignado_por_nombre || turno.asignado_por?.nombre || 'Sistema';

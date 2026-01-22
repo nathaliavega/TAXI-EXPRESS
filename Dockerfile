@@ -1,10 +1,10 @@
 FROM php:8.2-apache
 
-# Instala Node.js
+
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs
 
-# Instala dependencias del sistema y extensiones de PHP
+
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -18,28 +18,26 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install pdo_pgsql pgsql mbstring exif pcntl bcmath gd zip \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Instala Composer 2.x
+
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-# Copia archivos de dependencias
+
 COPY composer.json composer.lock package*.json ./
 
-# Instala dependencias de PHP (sin dev)
+
 RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
 
-# ⚡ CAMBIO CRÍTICO: Instalar TODAS las dependencias de Node (incluidas devDependencies)
-# porque Vite está en devDependencies y lo necesitamos para compilar
+
 RUN npm ci
 
-# Copia todo el código fuente
+
 COPY . /var/www/html
 
-# Ejecuta scripts post-install
+
 RUN composer run-script post-autoload-dump --no-interaction || true
 
-# Compila assets con Vite
 RUN npm run build
 
 # 🧹 OPCIONAL: Limpia node_modules después del build para reducir tamaño de imagen

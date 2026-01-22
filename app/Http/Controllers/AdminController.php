@@ -182,7 +182,7 @@ public function rechazarSolicitud($id)
        $mantenimientos = MantenimientoGeneral::orderBy('fecha_programada', 'desc')
         ->paginate(20);
 
-    // Agregar esta línea para obtener los vehículos
+    
     $vehiculos = Vehiculo::where('estado', 'activo')
         ->orderBy('numero_interno', 'asc')
         ->get();

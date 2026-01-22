@@ -12,13 +12,13 @@ class TurnoObligatorio extends Model
     use HasFactory;
 
     protected $table = 'turnos_obligatorios';
+
     protected $primaryKey = 'id_turno';
-    
-    // Deshabilitar timestamps automáticos de Laravel (created_at, updated_at)
+
     public $timestamps = false;
 
-    // Indicar que fecha_asignacion es un campo de fecha que Laravel debe manejar
     const CREATED_AT = 'fecha_asignacion';
+    
     const UPDATED_AT = null;
 
     protected $fillable = [
@@ -30,7 +30,6 @@ class TurnoObligatorio extends Model
         'fecha_asignacion'
     ];
 
-    // Convertir automáticamente estos campos a objetos Carbon
     protected $casts = [
         'fecha_turno' => 'date',
         'fecha_asignacion' => 'datetime',
@@ -39,12 +38,10 @@ class TurnoObligatorio extends Model
         'asignado_por' => 'integer'
     ];
 
-    // Valores por defecto
     protected $attributes = [
         'estado' => 'programado'
     ];
 
-    // Boot method para establecer fecha_asignacion automáticamente al crear
     protected static function boot()
     {
         parent::boot();
